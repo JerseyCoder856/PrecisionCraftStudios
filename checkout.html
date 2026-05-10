@@ -3,20 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Checkout</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 
 <script src="https://www.paypal.com/sdk/js?client-id=AbXrEojdTjfYNt3CrJ4g-UyVEyW-WP5iH-FWpXcCx6Fl6Xoir3sW7Canw8JE_M2cXF5mBYbgmDbV4tva&currency=USD"></script>
 
 <style>
-body { font-family: Jost, sans-serif; margin:0; padding:0; }
-.container { max-width:700px; margin:120px auto; padding:20px; }
+body { font-family: Arial; margin:0; padding:0; }
+.container { max-width:700px; margin:100px auto; padding:20px; }
 .item { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee; }
-.total { margin-top:20px; font-size:20px; font-weight:600; }
-.form { margin-top:30px; display:flex; flex-direction:column; gap:10px; }
-input, textarea { padding:12px; border:1px solid #ddd; border-radius:8px; }
+.total { margin-top:20px; font-size:20px; font-weight:bold; }
+.form { margin-top:20px; display:flex; flex-direction:column; gap:10px; }
+input, textarea { padding:10px; border:1px solid #ccc; }
 </style>
 </head>
 
@@ -35,11 +32,12 @@ input, textarea { padding:12px; border:1px solid #ddd; border-radius:8px; }
     <textarea id="address" placeholder="Address"></textarea>
   </div>
 
-  <div id="paypal-button-container" style="margin-top:30px;"></div>
+  <div id="paypal-button-container" style="margin-top:20px;"></div>
 
 </div>
 
 <script>
+
 window.addEventListener("DOMContentLoaded", () => {
 
   let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -47,8 +45,8 @@ window.addEventListener("DOMContentLoaded", () => {
   const itemsContainer = document.getElementById("checkoutItems");
   const totalContainer = document.getElementById("checkoutTotal");
 
-  function total() {
-    return cart.reduce((s, i) => s + i.price * i.qty, 0);
+  function getTotal() {
+    return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   }
 
   function render() {
@@ -66,22 +64,22 @@ window.addEventListener("DOMContentLoaded", () => {
       </div>
     `).join("");
 
-    totalContainer.innerText = "Total: $" + total().toFixed(2);
+    totalContainer.innerText = "Total: $" + getTotal().toFixed(2);
   }
 
   function customer() {
     return {
-      name: document.getElementById("name")?.value || "",
-      email: document.getElementById("email")?.value || "",
-      phone: document.getElementById("phone")?.value || "",
-      address: document.getElementById("address")?.value || ""
+      name: document.getElementById("name").value || "",
+      email: document.getElementById("email").value || "",
+      phone: document.getElementById("phone").value || "",
+      address: document.getElementById("address").value || ""
     };
   }
 
   function loadPayPal() {
 
     if (!window.paypal) {
-      console.error("PayPal failed to load");
+      console.error("PayPal not loaded");
       return;
     }
 
@@ -91,7 +89,7 @@ window.addEventListener("DOMContentLoaded", () => {
         return actions.order.create({
           purchase_units: [{
             amount: {
-              value: total().toFixed(2)
+              value: getTotal().toFixed(2)
             }
           }]
         });
@@ -112,11 +110,6 @@ window.addEventListener("DOMContentLoaded", () => {
 
           window.location.href = "success.html";
         });
-      },
-
-      onError: (err) => {
-        console.error(err);
-        alert("Payment error");
       }
 
     }).render("#paypal-button-container");
@@ -126,6 +119,7 @@ window.addEventListener("DOMContentLoaded", () => {
   loadPayPal();
 
 });
+
 </script>
 
 </body>
