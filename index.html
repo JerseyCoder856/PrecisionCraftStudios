@@ -341,15 +341,17 @@
   .about-visual {
     position: relative;
     display: flex;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    padding: 60px 20px 60px 40px;
   }
   .about-visual-inner {
     position: relative;
-    transform: translateX(90px);
+    width: 360px;
+    flex-shrink: 0;
   }
   .about-big-circle {
-    width: 420px;
-    height: 420px;
+    width: 360px;
+    height: 360px;
     border-radius: 50%;
     background: var(--mint-pale);
     position: relative;
@@ -357,7 +359,7 @@
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border: 15px solid var(--mint-light);
+    border: 12px solid var(--mint-light);
   }
   .about-big-circle img {
     width: 100%;
@@ -369,11 +371,20 @@
     background: var(--white);
     border: 1px solid var(--mint-light);
     border-radius: 4px;
-    padding: 18px 22px;
+    padding: 16px 20px;
     box-shadow: var(--shadow);
+    z-index: 2;
   }
-  .about-stat-card:nth-child(2) { top: 120px; left: 470px; right: auto; }
-  .about-stat-card:nth-child(3) { bottom: 190px; left: 540px; right: auto; }
+  /* Top-right of circle — sits above and to the right */
+  .about-stat-card:nth-child(2) {
+    top: -24px;
+    right: -60px;
+  }
+  /* Bottom-right — below the circle, shifted further right */
+  .about-stat-card:nth-child(3) {
+    bottom: -24px;
+    right: -90px;
+  }
   .about-stat-num {
     font-family: var(--font-display);
     font-size: 2.2rem;
@@ -382,7 +393,7 @@
     line-height: 1;
   }
   .about-stat-label { font-size: 0.72rem; letter-spacing: 0.1em; color: var(--gray); text-transform: uppercase; margin-top: 4px; }
-  .about-text { max-width: 520px; margin-right: auto; margin-left: 70px; }
+  .about-text { max-width: 520px; margin-right: auto; margin-left: 40px; }
   .about-text p {
     font-size: 1rem;
     line-height: 1.85;
@@ -615,27 +626,19 @@
   .gallery-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   /* ─── REVIEWS ─── */
-  #reviews { background: var(--mint-pale); overflow: hidden; }
+  #reviews { background: var(--mint-pale); }
   .reviews-header { text-align: center; margin-bottom: 48px; }
   .reviews-header .section-eyebrow { justify-content: center; }
   .reviews-header .section-eyebrow::before { display: none; }
-  .reviews-carousel-wrap { position: relative; }
-  .reviews-track-container { overflow: hidden; width: 100%; display: flex; justify-content: center; }
-  .reviews-track { display: flex; gap: 24px; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); }
-  .review-card { flex: 0 0 320px; background: var(--white); border-radius: 4px; padding: 32px; box-shadow: var(--shadow); border-top: 3px solid var(--mint); }
+  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1100px; margin: 0 auto; }
+  @media (max-width: 800px) { .reviews-grid { grid-template-columns: 1fr; } }
+  .review-card { background: var(--white); border-radius: 4px; padding: 32px; box-shadow: var(--shadow); border-top: 3px solid var(--mint); }
   .review-stars { display: flex; gap: 3px; margin-bottom: 16px; }
-  .review-star { color: var(--mint-deep); font-size: 1rem; }
   .review-text { font-family: var(--font-display); font-style: italic; font-size: 1.05rem; line-height: 1.7; color: var(--black-soft); margin-bottom: 20px; }
   .review-author { display: flex; align-items: center; gap: 12px; }
   .review-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--mint-light); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 600; font-size: 1rem; color: var(--mint-deep); flex-shrink: 0; }
   .review-name { font-size: 0.85rem; font-weight: 600; color: var(--black); }
   .review-product { font-size: 0.72rem; color: var(--gray); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
-  .reviews-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 36px; }
-  .review-arrow { width: 44px; height: 44px; border: 2px solid var(--mint); border-radius: 50%; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--mint-deep); transition: var(--transition); font-weight: 300; }
-  .review-arrow:hover { background: var(--mint); color: var(--white); }
-  .reviews-dots { display: flex; gap: 8px; justify-content: center; }
-  .review-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mint-light); cursor: pointer; transition: background var(--transition), transform var(--transition); }
-  .review-dot.active { background: var(--mint-deep); transform: scale(1.25); }
 
   /* ─── CONTACT ─── */
   #contact { background: var(--white); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
@@ -695,8 +698,9 @@
     #hero { grid-template-columns: 1fr; gap: 40px; padding-top: 100px; min-height: auto; padding-bottom: 60px; }
     .hero-visual { height: 340px; }
     #about { grid-template-columns: 1fr; }
+    .about-visual { justify-content: center; padding: 60px 80px 60px 40px; }
     .about-big-circle { width: 280px; height: 280px; }
-    .about-visual { display: flex; justify-content: center; }
+    .about-visual-inner { width: 280px; }
     #contact { grid-template-columns: 1fr; }
     .footer-top { grid-template-columns: 1fr 1fr; }
     .gallery-grid { grid-template-columns: repeat(6, 1fr); }
@@ -704,7 +708,6 @@
     .gallery-item:nth-child(n+2) { grid-column: span 3; grid-row: span 2; }
     .nav-links, .nav-cart-btn { display: none; }
     .nav-hamburger { display: flex; }
-    .reviews-track .review-card { flex: 0 0 280px; }
   }
   @media (max-width: 600px) {
     section { padding: 70px 5%; }
@@ -964,23 +967,21 @@
     <div class="section-eyebrow">Testimonials</div>
     <h2 class="section-title">What <em>Customers</em> Say</h2>
   </div>
-  
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Ordered a sticker pack and the quality is incredible — vibrant, durable, and the design came out perfectly. Fast shipping too!"</div>
-          <div class="review-author"><div class="review-avatar">A</div><div><div class="review-name">Aaliyah T.</div><div class="review-product">Custom Sticker Pack</div></div></div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Got matching hats for my partner and me. They came out stunning. The craftsmanship really shows — worth every penny."</div>
-          <div class="review-author"><div class="review-avatar">R</div><div><div class="review-name">Ryan &amp; Priya</div><div class="review-product">Matching Hat Set</div></div></div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"The communication was great, turnaround was fast, and the hat was exactly what I described. Precision in every sense of the word!"</div>
-          <div class="review-author"><div class="review-avatar">D</div><div><div class="review-name">Dante L.</div><div class="review-product">Custom Bucket Hat</div></div></div>
-        </div>
-      </div>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Ordered a sticker pack and the quality is incredible — vibrant, durable, and the design came out perfectly. Fast shipping too!"</div>
+      <div class="review-author"><div class="review-avatar">A</div><div><div class="review-name">Aaliyah T.</div><div class="review-product">Custom Sticker Pack</div></div></div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Got matching hats for my partner and me. They came out stunning. The craftsmanship really shows — worth every penny."</div>
+      <div class="review-author"><div class="review-avatar">R</div><div><div class="review-name">Ryan &amp; Priya</div><div class="review-product">Matching Hat Set</div></div></div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"The communication was great, turnaround was fast, and the hat was exactly what I described. Precision in every sense of the word!"</div>
+      <div class="review-author"><div class="review-avatar">D</div><div><div class="review-name">Dante L.</div><div class="review-product">Custom Bucket Hat</div></div></div>
     </div>
   </div>
 </section>
@@ -1203,69 +1204,7 @@
     });
   }
 
-  // ─── REVIEWS CAROUSEL ───
-  let reviewIndex = 1;
-  let reviewTrack, reviewCards, reviewCardWidth;
-
-  function initReviews() {
-    reviewTrack = document.getElementById('reviewsTrack');
-    const dotsContainer = document.getElementById('reviewDots');
-    reviewCards = Array.from(reviewTrack.querySelectorAll('.review-card'));
-    if (!reviewTrack || reviewCards.length === 0) return;
-
-    // Clone first and last for infinite loop
-    const firstClone = reviewCards[0].cloneNode(true);
-    const lastClone = reviewCards[reviewCards.length - 1].cloneNode(true);
-    reviewTrack.appendChild(firstClone);
-    reviewTrack.insertBefore(lastClone, reviewCards[0]);
-
-    reviewCardWidth = reviewCards[0].getBoundingClientRect().width + 24;
-    reviewTrack.style.transition = 'none';
-    reviewTrack.style.transform = `translateX(-${reviewIndex * reviewCardWidth}px)`;
-
-    // Build dots
-    dotsContainer.innerHTML = '';
-    reviewCards.forEach((_, i) => {
-      const dot = document.createElement('div');
-      dot.className = 'review-dot' + (i === 0 ? ' active' : '');
-      dot.onclick = () => goToReview(i + 1);
-      dotsContainer.appendChild(dot);
-    });
-  }
-
-  function goToReview(i) {
-    reviewIndex = i;
-    reviewTrack.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1)';
-    reviewTrack.style.transform = `translateX(-${reviewIndex * reviewCardWidth}px)`;
-    reviewTrack.addEventListener('transitionend', handleReviewLoop, { once: true });
-    updateReviewDots();
-  }
-
-  function nextReview() { goToReview(reviewIndex + 1); }
-  function prevReview() { goToReview(reviewIndex - 1); }
-
-  function handleReviewLoop() {
-    const total = reviewCards.length;
-    if (reviewIndex === 0) {
-      reviewTrack.style.transition = 'none';
-      reviewIndex = total;
-      reviewTrack.style.transform = `translateX(-${reviewIndex * reviewCardWidth}px)`;
-    }
-    if (reviewIndex === total + 1) {
-      reviewTrack.style.transition = 'none';
-      reviewIndex = 1;
-      reviewTrack.style.transform = `translateX(-${reviewIndex * reviewCardWidth}px)`;
-    }
-    updateReviewDots();
-  }
-
-  function updateReviewDots() {
-    const allDots = document.querySelectorAll('.review-dot');
-    let real = reviewIndex - 1;
-    if (real < 0) real = allDots.length - 1;
-    if (real >= allDots.length) real = 0;
-    allDots.forEach((d, i) => d.classList.toggle('active', i === real));
-  }
+  // Reviews are static — no carousel needed
 
   // ─── TOAST ───
   function showToast(msg) {
@@ -1284,7 +1223,6 @@
   // ─── INIT ───
   window.addEventListener('load', () => {
     updateCartCount();
-    initReviews();
   });
 </script>
 
