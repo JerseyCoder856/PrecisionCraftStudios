@@ -28,7 +28,7 @@
 
   html { 
     scroll-behavior: smooth;
-  scroll-padding-top: 90px; /* adjust based on navbar height */
+    scroll-padding-top: 90px;
   }
 
   body {
@@ -39,7 +39,6 @@
     font-weight: 300;
   }
 
-  /* ─── SCROLLBAR ─── */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--white); }
   ::-webkit-scrollbar-thumb { background: var(--mint); border-radius: 3px; }
@@ -60,34 +59,30 @@
   }
   nav.scrolled { box-shadow: 0 2px 20px rgba(0,0,0,0.08); }
 
-.nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  text-decoration: none;
-}
-
-/* force logo to NOT affect line alignment */
-.nav-logo-img {
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
-  flex-shrink: 0;
-}
-
-/* fix text vertical alignment issue */
-.nav-brand {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  line-height: 1.05; /* IMPORTANT change */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  color: var(--black);
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+  }
+  .nav-logo-img {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    flex-shrink: 0;
+  }
+  .nav-brand {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    line-height: 1.05;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: var(--black);
   }
   .nav-brand span { display: block; font-size: 0.65rem; font-family: var(--font-ui); font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gray); margin-top: 1px; }
 
@@ -267,56 +262,28 @@
     overflow: hidden;
     position: relative;
     background: var(--mint-light);
-   margin-top: 30px;
+    margin-top: 30px;
     margin-bottom: 30px;
   }
-  .hero-card:first-child { grid-row: 1 / 3; border-radius: 4px; 
-  }
-  
-  /* SECOND CARD LOWER */
-.hero-card:nth-child(2) {
- transform: translateY(15px)
-}
+  .hero-card:first-child { grid-row: 1 / 3; border-radius: 4px; }
+  .hero-card:nth-child(2) { transform: translateY(15px); }
+  .hero-card:nth-child(3) { height: 240px; margin-top: -20px; }
 
-/* THIRD CARD TALLER */
-.hero-card:nth-child(3) {
-  height: 240px;
-  margin-top: -20px;
-}
   .hero-card-image {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 16px;
-  position: relative;
-  display: block;
-    
-}
-
-.hero-card-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-  .hero-card-placeholder {
-    width: 100%; height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    color: var(--mint-deep);
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-    font-style: italic;
-    padding: 20px;
-    text-align: center;
-    background: linear-gradient(135deg, var(--mint-light) 0%, #b8dece 100%);
-    
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 16px;
+    position: relative;
+    display: block;
   }
-  .hero-card-placeholder svg { width: 40px; height: 40px; opacity: 0.6; }
+  .hero-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+  }
   .hero-card-label {
     position: absolute;
     bottom: 14px; left: 14px;
@@ -333,19 +300,14 @@
 
   /* ─── SECTION BASE ─── */
   section { 
-    padding: 80px 20px;   /* consistent spacing for every section */
-  position: relative;
+    padding: 80px 20px;
+    position: relative;
   }
-  
-  section + section {
-  margin-top: 0px;
-}
   .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-}
-  
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
   .section-eyebrow {
     display: inline-flex;
     align-items: center;
@@ -358,7 +320,6 @@
     margin-bottom: 16px;
   }
   .section-eyebrow::before { content: ''; width: 28px; height: 1.5px; background: var(--mint-deep); border-radius: 2px; }
-
   .section-title {
     font-family: var(--font-display);
     font-size: clamp(2.2rem, 4vw, 3.4rem);
@@ -377,34 +338,32 @@
     gap: 80px;
     align-items: center;
   }
- .about-visual {
-  position: relative;
-  display: flex;
-  justify-content: flex-end; /* pushes circle right */
-}
-  
+  .about-visual {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+  }
   .about-visual-inner {
-  position: relative;
-  transform: translateX(90px); /* ← MOVE EVERYTHING LEFT/RIGHT HERE */
-}
-  
- .about-big-circle {
-  width: 420px;
-  height: 420px;
-  border-radius: 50%;
-  background: var(--mint-pale);
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  border: 15px solid var(--mint-light); /* slightly stronger border */
-}
- .about-big-circle img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+    position: relative;
+    transform: translateX(90px);
+  }
+  .about-big-circle {
+    width: 420px;
+    height: 420px;
+    border-radius: 50%;
+    background: var(--mint-pale);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 15px solid var(--mint-light);
+  }
+  .about-big-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
   .about-stat-card {
     position: absolute;
     background: var(--white);
@@ -413,17 +372,8 @@
     padding: 18px 22px;
     box-shadow: var(--shadow);
   }
-  .about-stat-card:nth-child(2) {
-  top: 120px;
-  left: 470px;   /* changed from right → left */
-  right: auto;
-}
-
-.about-stat-card:nth-child(3) {
-  bottom: 190px;
-  left: 540px;   /* changed from right → left */
-  right: auto;
-}
+  .about-stat-card:nth-child(2) { top: 120px; left: 470px; right: auto; }
+  .about-stat-card:nth-child(3) { bottom: 190px; left: 540px; right: auto; }
   .about-stat-num {
     font-family: var(--font-display);
     font-size: 2.2rem;
@@ -432,13 +382,7 @@
     line-height: 1;
   }
   .about-stat-label { font-size: 0.72rem; letter-spacing: 0.1em; color: var(--gray); text-transform: uppercase; margin-top: 4px; }
-
-  .about-text {
-  max-width: 520px;
-  margin-right: auto;   /* pushes it LEFT */
-  margin-left: 70px;
-}
-  
+  .about-text { max-width: 520px; margin-right: auto; margin-left: 70px; }
   .about-text p {
     font-size: 1rem;
     line-height: 1.85;
@@ -447,51 +391,22 @@
     font-weight: 300;
     max-width: 520px;
   }
-  .about-pillars {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-top: 36px;
-  }
-  .pillar {
-    background: var(--mint-pale);
-    border-radius: 4px;
-    padding: 20px;
-    border-left: 3px solid var(--mint);
-  }
+  .about-pillars { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 36px; }
+  .pillar { background: var(--mint-pale); border-radius: 4px; padding: 20px; border-left: 3px solid var(--mint); }
   .pillar-title { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); margin-bottom: 6px; }
   .pillar-desc { font-size: 0.85rem; color: var(--gray); line-height: 1.6; }
 
   /* ─── SHOP ─── */
   #shop { background: var(--off-white); }
- .shop-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 24px;
-  margin-bottom: 40px;
-}
- .shop-filters {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: flex-end;
-}
-  
-  @media (max-width: 768px) {
   .shop-header {
+    display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 20px;
+    gap: 24px;
+    margin-bottom: 40px;
   }
-
-  .shop-filters {
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-}
+  .shop-filters { display: flex; gap: 12px; align-items: center; justify-content: center; }
   .filter-btn {
     padding: 8px 20px;
     border-radius: 2px;
@@ -506,43 +421,20 @@
     transition: var(--transition);
     font-weight: 500;
   }
-  .filter-btn.active, .filter-btn:hover {
-    border-color: var(--mint);
-    color: var(--black);
-    background: var(--mint-pale);
-  }
+  .filter-btn.active, .filter-btn:hover { border-color: var(--mint); color: var(--black); background: var(--mint-pale); }
 
- .products-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-  
-  @media (max-width: 1200px) {
   .products-grid {
-    grid-template-columns: repeat(4, 1fr);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
   }
-}
+  @media (max-width: 1200px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
+  @media (max-width: 992px) { .products-grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px) { .products-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .products-grid { grid-template-columns: 1fr; } }
 
-@media (max-width: 992px) {
-  .products-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 480px) {
-  .products-grid {
-    grid-template-columns: 1fr;
-  }
-}
   .product-card {
     background: var(--white);
     border-radius: 4px;
@@ -555,46 +447,20 @@
   .product-card:hover .product-image-overlay { opacity: 1; }
 
   .product-image {
-  position: relative;
-  height: 260px;
-  background: var(--mint-pale);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* REAL IMAGE SUPPORT */
-.product-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;   /* makes image fill nicely without stretching */
-  display: block;
-}
-
-/* KEEP OVERLAY */
-.product-image-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(17,17,17,0.08);
-  opacity: 0;
-  transition: opacity var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-  .product-image-placeholder {
+    position: relative;
+    height: 260px;
+    background: var(--mint-pale);
+    overflow: hidden;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 12px;
-    color: var(--mint-deep);
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 0.95rem;
+    justify-content: center;
   }
-  .product-image-placeholder svg { width: 48px; height: 48px; opacity: 0.5; }
-
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
   .product-image-overlay {
     position: absolute;
     inset: 0;
@@ -618,32 +484,12 @@
     font-weight: 600;
   }
   .product-badge.new { background: var(--mint-deep); }
-
   .product-info { padding: 20px; }
-  .product-category {
-    font-size: 0.68rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--mint-deep);
-    font-weight: 500;
-    margin-bottom: 6px;
-  }
-  .product-name {
-    font-family: var(--font-display);
-    font-size: 1.2rem;
-    font-weight: 400;
-    color: var(--black);
-    margin-bottom: 4px;
-    line-height: 1.2;
-  }
+  .product-category { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mint-deep); font-weight: 500; margin-bottom: 6px; }
+  .product-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; color: var(--black); margin-bottom: 4px; line-height: 1.2; }
   .product-desc { font-size: 0.82rem; color: var(--gray); margin-bottom: 16px; line-height: 1.6; }
   .product-footer { display: flex; justify-content: space-between; align-items: center; }
-  .product-price {
-    font-family: var(--font-display);
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--black);
-  }
+  .product-price { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: var(--black); }
   .add-to-cart {
     background: var(--black);
     color: var(--white);
@@ -675,7 +521,6 @@
     transition: opacity 0.35s;
   }
   .cart-overlay.open { opacity: 1; pointer-events: all; }
-
   .cart-drawer {
     position: fixed;
     top: 0; right: 0;
@@ -691,76 +536,24 @@
     box-shadow: -8px 0 40px rgba(0,0,0,0.15);
   }
   .cart-drawer.open { transform: translateX(0); }
-
-  .cart-header {
-    padding: 28px;
-    border-bottom: 1px solid var(--gray-light);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+  .cart-header { padding: 28px; border-bottom: 1px solid var(--gray-light); display: flex; justify-content: space-between; align-items: center; }
   .cart-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 400; }
-  .cart-close {
-    background: none; border: none; cursor: pointer;
-    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-    border-radius: 50%; transition: background var(--transition);
-    font-size: 1.2rem;
-  }
+  .cart-close { background: none; border: none; cursor: pointer; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: background var(--transition); font-size: 1.2rem; }
   .cart-close:hover { background: var(--mint-pale); }
-
   .cart-items { flex: 1; overflow-y: auto; padding: 20px 28px; }
-  .cart-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-    color: var(--gray);
-    font-style: italic;
-    font-family: var(--font-display);
-    font-size: 1rem;
-  }
-
-  .cart-item {
-    display: flex;
-    gap: 16px;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--gray-light);
-    align-items: center;
-  }
-  .cart-item-img {
-    width: 64px; height: 64px;
-    border-radius: 3px;
-    background: var(--mint-pale);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
+  .cart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--gray); font-style: italic; font-family: var(--font-display); font-size: 1rem; }
+  .cart-item { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--gray-light); align-items: center; }
+  .cart-item-img { width: 64px; height: 64px; border-radius: 3px; background: var(--mint-pale); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .cart-item-info { flex: 1; }
   .cart-item-name { font-size: 0.88rem; font-weight: 500; color: var(--black); margin-bottom: 4px; }
   .cart-item-price { font-size: 0.82rem; color: var(--mint-deep); font-family: var(--font-display); font-weight: 600; }
-  .cart-item-qty {
-    display: flex; align-items: center; gap: 10px;
-    margin-top: 8px;
-  }
-  .qty-btn {
-    width: 24px; height: 24px;
-    border: 1.5px solid var(--gray-light);
-    background: none;
-    border-radius: 2px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.9rem;
-    transition: var(--transition);
-  }
+  .cart-item-qty { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+  .qty-btn { width: 24px; height: 24px; border: 1.5px solid var(--gray-light); background: none; border-radius: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: var(--transition); }
   .qty-btn:hover { border-color: var(--mint); color: var(--mint-deep); }
   .qty-val { font-size: 0.85rem; font-weight: 500; min-width: 16px; text-align: center; }
   .cart-item-remove { background: none; border: none; cursor: pointer; color: var(--gray); font-size: 1rem; padding: 4px; transition: color var(--transition); }
   .cart-item-remove:hover { color: #e53e3e; }
-
-  .cart-footer {
-    padding: 24px 28px;
-    border-top: 1px solid var(--gray-light);
-  }
+  .cart-footer { padding: 24px 28px; border-top: 1px solid var(--gray-light); }
   .cart-total { display: flex; justify-content: space-between; margin-bottom: 20px; }
   .cart-total-label { font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
   .cart-total-price { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; }
@@ -783,43 +576,15 @@
 
   /* ─── GALLERY ─── */
   #gallery { background: var(--white); }
-  .gallery-header {
-  display: flex;
-  justify-content: flex-start;
-  align-items: flex-end;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-  .gallery-header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 15px;
-  margin-bottom: 40px;
-}
-
-.gallery-filters {
-  display: flex;
-  gap: 10px;
-  margin-top: -20px;
-}
- 
-
+  .gallery-header { display: flex; flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 40px; }
+  .gallery-filters { display: flex; gap: 10px; margin-top: -20px; }
   .gallery-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     grid-auto-rows: 120px;
     gap: 14px;
   }
-  .gallery-item {
-    border-radius: 4px;
-    overflow: hidden;
-    position: relative;
-    ;
-    cursor: pointer;
-    transition: transform var(--transition);
-  }
+  .gallery-item { border-radius: 4px; overflow: hidden; position: relative; cursor: pointer; transition: transform var(--transition); }
   .gallery-item:hover { transform: scale(1.01); }
   .gallery-item:hover .gallery-item-overlay { opacity: 1; }
   .gallery-item:nth-child(1) { grid-column: span 5; grid-row: span 3; }
@@ -829,19 +594,7 @@
   .gallery-item:nth-child(5) { grid-column: span 3; grid-row: span 2; }
   .gallery-item:nth-child(6) { grid-column: span 3; grid-row: span 2; background: var(--mint-light); }
   .gallery-item:nth-child(7) { grid-column: span 4; grid-row: span 2; }
-
-  .gallery-item-inner {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 0; /* important */
-  overflow: hidden;
-}
-  .gallery-item-inner svg { width: 32px; height: 32px; opacity: 0.45; }
-
+  .gallery-item-inner { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 0; overflow: hidden; }
   .gallery-item-overlay {
     position: absolute;
     inset: 0;
@@ -858,292 +611,80 @@
     flex-direction: column;
     gap: 6px;
   }
-  .gallery-item-overlay .tag {
-    font-size: 0.65rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    font-style: normal;
-    font-family: var(--font-ui);
-    background: var(--mint);
-    padding: 3px 10px;
-    border-radius: 2px;
-  }
-  
-  .gallery-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
+  .gallery-item-overlay .tag { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; font-style: normal; font-family: var(--font-ui); background: var(--mint); padding: 3px 10px; border-radius: 2px; }
+  .gallery-img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   /* ─── REVIEWS ─── */
   #reviews { background: var(--mint-pale); overflow: hidden; }
   .reviews-header { text-align: center; margin-bottom: 48px; }
   .reviews-header .section-eyebrow { justify-content: center; }
   .reviews-header .section-eyebrow::before { display: none; }
-
   .reviews-carousel-wrap { position: relative; }
-  .reviews-track-container { 
-    overflow: hidden; 
-    width: 100%;
-    display: flex;
-  justify-content: center; /* centers the visible area */
-  }
-  .reviews-track {
-    display: flex;
-    gap: 24px;
-    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
-  }
-
-  .review-card {
-    flex: 0 0 320px;
-    background: var(--white);
-    border-radius: 4px;
-    padding: 32px;
-    box-shadow: var(--shadow);
-    border-top: 3px solid var(--mint);
-  }
+  .reviews-track-container { overflow: hidden; width: 100%; display: flex; justify-content: center; }
+  .reviews-track { display: flex; gap: 24px; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+  .review-card { flex: 0 0 320px; background: var(--white); border-radius: 4px; padding: 32px; box-shadow: var(--shadow); border-top: 3px solid var(--mint); }
   .review-stars { display: flex; gap: 3px; margin-bottom: 16px; }
   .review-star { color: var(--mint-deep); font-size: 1rem; }
-  .review-text {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 1.05rem;
-    line-height: 1.7;
-    color: var(--black-soft);
-    margin-bottom: 20px;
-  }
+  .review-text { font-family: var(--font-display); font-style: italic; font-size: 1.05rem; line-height: 1.7; color: var(--black-soft); margin-bottom: 20px; }
   .review-author { display: flex; align-items: center; gap: 12px; }
-  .review-avatar {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    background: var(--mint-light);
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1rem;
-    color: var(--mint-deep);
-    flex-shrink: 0;
-  }
+  .review-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--mint-light); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 600; font-size: 1rem; color: var(--mint-deep); flex-shrink: 0; }
   .review-name { font-size: 0.85rem; font-weight: 600; color: var(--black); }
   .review-product { font-size: 0.72rem; color: var(--gray); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
-
-  .reviews-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    margin-top: 36px;
-  }
-  .review-arrow {
-    width: 44px; height: 44px;
-    border: 2px solid var(--mint);
-    border-radius: 50%;
-    background: none;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem;
-    color: var(--mint-deep);
-    transition: var(--transition);
-    font-weight: 300;
-  }
+  .reviews-controls { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 36px; }
+  .review-arrow { width: 44px; height: 44px; border: 2px solid var(--mint); border-radius: 50%; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: var(--mint-deep); transition: var(--transition); font-weight: 300; }
   .review-arrow:hover { background: var(--mint); color: var(--white); }
-  .reviews-dots { display: flex; gap: 8px; justify-content: center;}
-  .review-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--mint-light);
-    cursor: pointer;
-    transition: background var(--transition), transform var(--transition);
-  }
+  .reviews-dots { display: flex; gap: 8px; justify-content: center; }
+  .review-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--mint-light); cursor: pointer; transition: background var(--transition), transform var(--transition); }
   .review-dot.active { background: var(--mint-deep); transform: scale(1.25); }
 
   /* ─── CONTACT ─── */
-  #contact {
-    background: var(--white);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
-  }
-  .contact-info { }
+  #contact { background: var(--white); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
   .contact-tagline { font-size: 1rem; color: var(--gray); line-height: 1.8; margin-bottom: 36px; font-weight: 300; }
-
   .contact-socials { display: flex; gap: 14px; margin-bottom: 36px; }
-  .social-link {
-    width: 44px; height: 44px;
-    border: 1.5px solid var(--black);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--black);
-    text-decoration: none;
-    transition: var(--transition);
-    font-size: 1rem;
-  }
+  .social-link { width: 44px; height: 44px; border: 1.5px solid var(--black); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--black); text-decoration: none; transition: var(--transition); font-size: 1rem; }
   .social-link:hover { background: var(--black); color: var(--white); transform: translateY(-2px); }
-
   .contact-detail { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; color: var(--gray); font-size: 0.9rem; }
   .contact-detail svg { width: 18px; height: 18px; color: var(--mint-deep); flex-shrink: 0; }
-
-  .contact-form { }
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
   .form-group { margin-bottom: 16px; }
-  .form-label {
-    display: block;
-    font-size: 0.72rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--black);
-    font-weight: 500;
-    margin-bottom: 8px;
-  }
-  .form-input, .form-textarea, .form-select {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1.5px solid var(--gray-light);
-    border-radius: 2px;
-    font-family: var(--font-ui);
-    font-size: 0.9rem;
-    color: var(--black);
-    background: var(--white);
-    outline: none;
-    transition: border-color var(--transition);
-    font-weight: 300;
-  }
+  .form-label { display: block; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); font-weight: 500; margin-bottom: 8px; }
+  .form-input, .form-textarea, .form-select { width: 100%; padding: 12px 16px; border: 1.5px solid var(--gray-light); border-radius: 2px; font-family: var(--font-ui); font-size: 0.9rem; color: var(--black); background: var(--white); outline: none; transition: border-color var(--transition); font-weight: 300; }
   .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--mint); }
   .form-textarea { resize: vertical; min-height: 120px; }
-  .form-submit {
-    width: 100%;
-    background: var(--black);
-    color: var(--white);
-    border: none;
-    padding: 16px;
-    border-radius: 2px;
-    font-family: var(--font-ui);
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background var(--transition), transform var(--transition);
-    margin-top: 8px;
-  }
+  .form-submit { width: 100%; background: var(--black); color: var(--white); border: none; padding: 16px; border-radius: 2px; font-family: var(--font-ui); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: background var(--transition), transform var(--transition); margin-top: 8px; }
   .form-submit:hover { background: var(--mint-deep); transform: translateY(-1px); }
-  .form-success {
-    display: none;
-    background: var(--mint-pale);
-    border: 1px solid var(--mint);
-    border-radius: 3px;
-    padding: 14px 20px;
-    color: var(--mint-deep);
-    font-size: 0.88rem;
-    margin-top: 12px;
-    text-align: center;
-  }
+  .form-success { display: none; background: var(--mint-pale); border: 1px solid var(--mint); border-radius: 3px; padding: 14px 20px; color: var(--mint-deep); font-size: 0.88rem; margin-top: 12px; text-align: center; }
 
   /* ─── FOOTER ─── */
-  footer {
-    background: var(--black);
-    color: var(--white);
-    padding: 60px 5% 30px;
-  }
-  .footer-top {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 48px;
-    margin-bottom: 48px;
-    padding-bottom: 48px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-  }
+  footer { background: var(--black); color: var(--white); padding: 60px 5% 30px; }
+  .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; padding-bottom: 48px; border-bottom: 1px solid rgba(255,255,255,0.1); }
   .footer-brand .nav-logo { margin-bottom: 16px; display: inline-flex; }
-  .footer-brand .nav-logo svg path, .footer-brand .nav-logo svg circle { stroke: white; }
   .footer-brand p { font-size: 0.85rem; color: rgba(255,255,255,0.5); line-height: 1.75; }
   .footer-brand .nav-brand { color: var(--white); }
   .footer-brand .nav-brand span { color: rgba(255,255,255,0.4); }
-
-  .footer-col h4 {
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--mint);
-    font-weight: 500;
-    margin-bottom: 20px;
-  }
+  .footer-col h4 { font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mint); font-weight: 500; margin-bottom: 20px; }
   .footer-col ul { list-style: none; }
   .footer-col ul li { margin-bottom: 10px; }
-  .footer-col ul a {
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.55);
-    text-decoration: none;
-    transition: color var(--transition);
-  }
+  .footer-col ul a { font-size: 0.85rem; color: rgba(255,255,255,0.55); text-decoration: none; transition: color var(--transition); }
   .footer-col ul a:hover { color: var(--mint); }
-
-  .footer-bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-  }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
   .footer-bottom p { font-size: 0.78rem; color: rgba(255,255,255,0.35); }
   .footer-socials { display: flex; gap: 12px; }
-  .footer-social {
-    width: 36px; height: 36px;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    color: rgba(255,255,255,0.55);
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: var(--transition);
-  }
+  .footer-social { width: 36px; height: 36px; border: 1px solid rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.55); text-decoration: none; font-size: 0.9rem; transition: var(--transition); }
   .footer-social:hover { border-color: var(--mint); color: var(--mint); }
 
   /* ─── TOAST ─── */
-  .toast {
-    position: fixed;
-    bottom: 32px; left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--black);
-    color: var(--white);
-    padding: 14px 28px;
-    border-radius: 2px;
-    font-size: 0.82rem;
-    font-weight: 500;
-    letter-spacing: 0.06em;
-    z-index: 9999;
-    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
-    border-left: 3px solid var(--mint);
-    white-space: nowrap;
-  }
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--black); color: var(--white); padding: 14px 28px; border-radius: 2px; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.06em; z-index: 9999; transition: transform 0.4s cubic-bezier(0.4,0,0.2,1); border-left: 3px solid var(--mint); white-space: nowrap; }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
   /* ─── MOBILE NAV MENU ─── */
-  .mobile-menu {
-    position: fixed;
-    top: 72px; left: 0; right: 0;
-    background: var(--white);
-    border-bottom: 1px solid var(--gray-light);
-    padding: 20px 5%;
-    display: none;
-    flex-direction: column;
-    gap: 16px;
-    z-index: 999;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
-  }
+  .mobile-menu { position: fixed; top: 72px; left: 0; right: 0; background: var(--white); border-bottom: 1px solid var(--gray-light); padding: 20px 5%; display: none; flex-direction: column; gap: 16px; z-index: 999; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
   .mobile-menu.open { display: flex; }
   .mobile-menu a { font-size: 0.9rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); text-decoration: none; }
 
   /* ─── ANIMATIONS ─── */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .fade-up {
-    opacity: 0;
-    animation: fadeUp 0.7s ease forwards;
-  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { opacity: 0; animation: fadeUp 0.7s ease forwards; }
   .delay-1 { animation-delay: 0.1s; }
   .delay-2 { animation-delay: 0.25s; }
   .delay-3 { animation-delay: 0.4s; }
@@ -1191,20 +732,16 @@
       <span class="cart-total-label">Total</span>
       <span class="cart-total-price" id="cartTotal">$0.00</span>
     </div>
-    <button class="checkout-btn" onclick="proceedToCheckout()">
-  Proceed to Checkout →
-</button>
+    <button class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout →</button>
   </div>
 </div>
 
 <!-- ─── NAVIGATION ─── -->
 <nav id="navbar">
- <a href="#" class="nav-logo">
-  <!-- IMAGE LOGO INSTEAD OF SVG -->
-  <img src="https://i.imgur.com/v8Omcnw.png" alt="Precision Craft Studios Logo" class="nav-logo-img">
+  <a href="#" class="nav-logo">
+    <img src="https://i.imgur.com/v8Omcnw.png" alt="Precision Craft Studios Logo" class="nav-logo-img">
     <div class="nav-brand">Precision Craft Studios<span>Crafting What Brings Joy</span></div>
   </a>
-
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#shop">Shop</a></li>
@@ -1212,7 +749,6 @@
     <li><a href="#reviews">Reviews</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
-
   <button class="nav-cart-btn" onclick="openCart()">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/>
@@ -1221,7 +757,6 @@
     Cart
     <span class="cart-count" id="cartCount">0</span>
   </button>
-
   <button class="nav-hamburger" id="hamburger" onclick="toggleMobileMenu()">
     <span></span><span></span><span></span>
   </button>
@@ -1234,88 +769,63 @@
   <a href="#gallery" onclick="closeMobileMenu()">Gallery</a>
   <a href="#reviews" onclick="closeMobileMenu()">Reviews</a>
   <a href="#contact" onclick="closeMobileMenu()">Contact</a>
-  <a href="#" onclick="openCart(); closeMobileMenu()">Cart (0)</a>
+  <a href="#" onclick="openCart(); closeMobileMenu()">Cart (<span id="mobileCartCount">0</span>)</a>
 </div>
 
 <!-- ─── HERO ─── -->
 <section id="hero">
   <div class="hero-text">
     <div class="hero-eyebrow fade-up">Handcrafted with Precision</div>
-    <h1 class="hero-title fade-up delay-1">
-      Where <em>Craft</em><br>Meets <em>Art</em>
-    </h1>
+    <h1 class="hero-title fade-up delay-1">Where <em>Craft</em><br>Meets <em>Art</em></h1>
     <p class="hero-tagline fade-up delay-2">Custom-designed products born from a passion for handcrafted creativity. Every piece tells a story — yours.</p>
     <div class="hero-buttons fade-up delay-3">
       <a href="#shop" class="btn-primary">Shop Now →</a>
       <a href="#gallery" class="btn-secondary">View Gallery</a>
     </div>
   </div>
-
   <div class="hero-visual fade-up delay-2">
-
-  <div class="hero-card">
-    <div class="hero-card-image">
-      <img src="https://constasy.com/wp-content/uploads/2024/05/greenflowers4_m.jpg" alt="Custom Painted Hats">
+    <div class="hero-card">
+      <div class="hero-card-image"><img src="https://constasy.com/wp-content/uploads/2024/05/greenflowers4_m.jpg" alt="Custom Painted Hats"></div>
+      <span class="hero-card-label">Featured</span>
     </div>
-    <span class="hero-card-label">Featured</span>
-  </div>
-
-  <div class="hero-card">
-    <div class="hero-card-image">
-      <img src="https://stickercoven.com/cdn/shop/files/3inch_sticker_banner-lighter.png?v=1771011849&width=1946">
+    <div class="hero-card">
+      <div class="hero-card-image"><img src="https://stickercoven.com/cdn/shop/files/3inch_sticker_banner-lighter.png?v=1771011849&width=1946"></div>
+      <span class="hero-card-label">New</span>
     </div>
-    <span class="hero-card-label">New</span>
-  </div>
-
-  <div class="hero-card">
-    <div class="hero-card-image">
-      <img src="https://i0.wp.com/www.ambromanufacturing.com/wp-content/uploads/2025/11/riverstone-brewery-taproom-shirts-trucker-caps.jpg?fit=1120%2C871&ssl=1" alt="More Coming Soon">
+    <div class="hero-card">
+      <div class="hero-card-image"><img src="https://i0.wp.com/www.ambromanufacturing.com/wp-content/uploads/2025/11/riverstone-brewery-taproom-shirts-trucker-caps.jpg?fit=1120%2C871&ssl=1" alt="More Coming Soon"></div>
+      <span class="hero-card-label">New</span>
     </div>
-    <span class="hero-card-label">New</span>
   </div>
-
-</div>
 </section>
 
 <!-- ─── ABOUT ─── -->
 <section id="about">
-  <div class="about-visual-inner">
-     <div class="about-big-circle">
-      <img src="https://i.imgur.com/v8Omcnw.png" alt="About image" />
-    </div>
-    </div>
-    <div class="about-stat-card">
-      <div class="about-stat-num">100%</div>
-      <div class="about-stat-label">Handmade</div>
-    </div>
-    <div class="about-stat-card">
-      <div class="about-stat-num">∞</div>
-      <div class="about-stat-label">Custom Options</div>
+  <div class="about-visual">
+    <div class="about-visual-inner">
+      <div class="about-big-circle">
+        <img src="https://i.imgur.com/v8Omcnw.png" alt="About image" />
+      </div>
+      <div class="about-stat-card">
+        <div class="about-stat-num">100%</div>
+        <div class="about-stat-label">Handmade</div>
+      </div>
+      <div class="about-stat-card">
+        <div class="about-stat-num">∞</div>
+        <div class="about-stat-label">Custom Options</div>
+      </div>
     </div>
   </div>
-
   <div class="about-text">
     <div class="section-eyebrow">Our Story</div>
     <h2 class="section-title">Crafted with <em>passion</em>, built with precision</h2>
     <p>Precision Craft Studios was born from a simple belief — that handmade things carry a kind of magic that mass production can never replicate. Every stitch, every brushstroke, every design is an act of care and intention.</p>
     <p>We specialize in custom painted hats, unique stickers, and a growing collection of creative goods — all made to reflect your vision and personality. No two pieces are alike. That's kind of the point.</p>
     <div class="about-pillars">
-      <div class="pillar">
-        <div class="pillar-title">Precision</div>
-        <div class="pillar-desc">Every detail is intentional, clean, and refined down to the last element.</div>
-      </div>
-      <div class="pillar">
-        <div class="pillar-title">Creativity</div>
-        <div class="pillar-desc">Unlimited customization driven by imagination and artistic vision.</div>
-      </div>
-      <div class="pillar">
-        <div class="pillar-title">Quality</div>
-        <div class="pillar-desc">Premium materials that hold up beautifully through everyday life.</div>
-      </div>
-      <div class="pillar">
-        <div class="pillar-title">Joy</div>
-        <div class="pillar-desc">We craft what brings happiness — to you and everyone who sees it.</div>
-      </div>
+      <div class="pillar"><div class="pillar-title">Precision</div><div class="pillar-desc">Every detail is intentional, clean, and refined down to the last element.</div></div>
+      <div class="pillar"><div class="pillar-title">Creativity</div><div class="pillar-desc">Unlimited customization driven by imagination and artistic vision.</div></div>
+      <div class="pillar"><div class="pillar-title">Quality</div><div class="pillar-desc">Premium materials that hold up beautifully through everyday life.</div></div>
+      <div class="pillar"><div class="pillar-title">Joy</div><div class="pillar-desc">We craft what brings happiness — to you and everyone who sees it.</div></div>
     </div>
   </div>
 </section>
@@ -1327,7 +837,6 @@
       <div class="section-eyebrow">Our Products</div>
       <h2 class="section-title">Shop the <em>Collection</em></h2>
     </div>
-
     <div class="shop-filters">
       <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
       <button class="filter-btn" onclick="filterProducts('hats', this)">Hats</button>
@@ -1335,7 +844,6 @@
       <button class="filter-btn" onclick="filterProducts('baskets', this)">Baskets</button>
     </div>
   </div>
-
   <div class="products-grid" id="productsGrid">
 
     <!-- PRODUCT 1 -->
@@ -1344,17 +852,13 @@
         <img src="https://i.imgur.com/UvCAau4.jpeg" alt="Signature Painted Cap">
         <div class="product-image-overlay"></div>
       </div>
-
       <div class="product-info">
         <div class="product-category">Hats</div>
         <div class="product-name">Signature Snapback</div>
         <div class="product-desc">Hand-painted with a custom design. Structured fit, premium fabric.</div>
-
         <div class="product-footer">
           <div class="product-price">$20.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'Signature Painted Cap', 55.00)">
-            Add
-          </button>
+          <button class="add-to-cart" onclick="addToCart(this, 'Signature Snapback', 20.00)">Add</button>
         </div>
       </div>
     </div>
@@ -1365,17 +869,13 @@
         <img src="https://i.imgur.com/G7q8G2T.jpeg" alt="Custom Bucket Hat">
         <div class="product-image-overlay"></div>
       </div>
-
       <div class="product-info">
         <div class="product-category">Hats</div>
         <div class="product-name">Custom Bucket Hat</div>
         <div class="product-desc">Hand-illustrated bucket hat. 100% cotton. Your art, your style.</div>
-
         <div class="product-footer">
           <div class="product-price">$25.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'Custom Bucket Hat', 48.00)">
-            Add
-          </button>
+          <button class="add-to-cart" onclick="addToCart(this, 'Custom Bucket Hat', 25.00)">Add</button>
         </div>
       </div>
     </div>
@@ -1386,17 +886,13 @@
         <img src="https://i.imgur.com/UlxRQ5j.jpeg" alt="Custom Sticker Pack">
         <div class="product-image-overlay"></div>
       </div>
-
       <div class="product-info">
         <div class="product-category">Stickers</div>
         <div class="product-name">Custom Sticker Pack</div>
         <div class="product-desc">Set of 10+ custom die-cut stickers 4"x 7". Waterproof & UV-resistant vinyl.</div>
-
         <div class="product-footer">
           <div class="product-price">$5.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'Custom Sticker Pack', 18.00)">
-            Add
-          </button>
+          <button class="add-to-cart" onclick="addToCart(this, 'Custom Sticker Pack', 5.00)">Add</button>
         </div>
       </div>
     </div>
@@ -1404,45 +900,37 @@
     <!-- PRODUCT 4 -->
     <div class="product-card" data-category="stickers">
       <div class="product-image">
-        <img src="https://i.imgur.com/pjgXs3h.png" alt="Large Logo Sticker">
+        <img src="https://i.imgur.com/pjgXs3h.png" alt="Logo Sticker Pack">
         <div class="product-image-overlay"></div>
       </div>
-
       <div class="product-info">
         <div class="product-category">Stickers</div>
-        <div class="product-name"> Logo Sticker Pack</div>
+        <div class="product-name">Logo Sticker Pack</div>
         <div class="product-desc">Bold, custom die-cut 4"x 7" stickers for laptops, water bottles, and more.</div>
-
         <div class="product-footer">
           <div class="product-price">$5.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'Large Logo Sticker', 8.00)">
-            Add
-          </button>
+          <button class="add-to-cart" onclick="addToCart(this, 'Logo Sticker Pack', 5.00)">Add</button>
         </div>
       </div>
     </div>
 
-    <!-- PRODUCT 3 -->
+    <!-- PRODUCT 5 -->
     <div class="product-card" data-category="baskets">
       <div class="product-image">
-        <img src="https://i.imgur.com/ItSXFVP.jpeg" alt="Custom Sticker Pack">
+        <img src="https://i.imgur.com/ItSXFVP.jpeg" alt="Artisan Straw Baskets">
         <div class="product-image-overlay"></div>
       </div>
-
       <div class="product-info">
         <div class="product-category">Baskets</div>
         <div class="product-name">Artisan Straw Baskets</div>
-        <div class="product-desc"> A solid, hand-woven straw basket curated for gifting and lasting quality.</div>
-
+        <div class="product-desc">A solid, hand-woven straw basket curated for gifting and lasting quality.</div>
         <div class="product-footer">
           <div class="product-price">$30.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'Custom Sticker Pack', 18.00)">
-            Add
-          </button>
+          <button class="add-to-cart" onclick="addToCart(this, 'Artisan Straw Basket', 30.00)">Add</button>
         </div>
       </div>
     </div>
-    
+
   </div>
 </section>
 
@@ -1453,149 +941,55 @@
       <div class="section-eyebrow">Past Work</div>
       <h2 class="section-title">The <em>Gallery</em></h2>
     </div>
-
     <div class="gallery-filters">
       <button class="filter-btn active" onclick="filterGallery('all', this)">All Work</button>
       <button class="filter-btn" onclick="filterGallery('hats', this)">Hats</button>
       <button class="filter-btn" onclick="filterGallery('stickers', this)">Stickers</button>
     </div>
   </div>
-
   <div class="gallery-grid" id="galleryGrid">
-
-    <!-- ITEM 1 -->
-    <div class="gallery-item" data-cat="hats">
-      <div class="gallery-item-inner">
-        <img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img">
-      </div>
-      <div class="gallery-item-overlay">
-        <span class="tag">Hats</span>
-        CAMDEN
-      </div>
-    </div>
-
-    <!-- ITEM 2 -->
-     <div class="gallery-item" data-cat="hats">
-      <div class="gallery-item-inner">
-        <img src="https://i.imgur.com/6V7wXFP.jpeg" alt="Script Hat" class="gallery-img">
-        
-      </div>
-      <div class="gallery-item-overlay">
-        <span class="tag">Hats</span>
-        Script Lettering Hat
-      </div>
-    </div>
-
-    <!-- ITEM 3 -->
-     <div class="gallery-item" data-cat="hats">
-      <div class="gallery-item-inner">
-        <img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img">
-      </div>
-      <div class="gallery-item-overlay">
-        <span class="tag">Hats</span>
-        CAMDEN
-      </div>
-    </div>
-
-    <!-- ITEM 4 -->
-     <div class="gallery-item" data-cat="hats">
-      <div class="gallery-item-inner">
-        <img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img">
-      </div>
-      <div class="gallery-item-overlay">
-        <span class="tag">Hats</span>
-        CAMDEN
-      </div>
-    </div>
-
-    <!-- ITEM 5 -->
-     <div class="gallery-item" data-cat="hats">
-      <div class="gallery-item-inner">
-        <img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img">
-      </div>
-      <div class="gallery-item-overlay">
-        <span class="tag">Hats</span>
-        CAMDEN
-      </div>
-    </div>
-    <!-- ITEM 6 -->
-     <div class="gallery-item" data-cat="hats">
-      <div class="gallery-item-inner">
-        <img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img">
-      </div>
-      <div class="gallery-item-overlay">
-        <span class="tag">Hats</span>
-        CAMDEN
-      </div>
-    </div>
-    <!-- ITEM 7 -->
-    <div class="gallery-item" data-cat="hats">
-      <div class="gallery-item-inner">
-        <img src="https://i.imgur.com/6V7wXFP.jpeg" alt="Script Hat" class="gallery-img">
-        
-      </div>
-      <div class="gallery-item-overlay">
-        <span class="tag">Hats</span>
-        Script Lettering Hat
-      </div>
-    </div>
-
+    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>CAMDEN</div></div>
+    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/6V7wXFP.jpeg" alt="Script Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>Script Lettering Hat</div></div>
+    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>CAMDEN</div></div>
+    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>CAMDEN</div></div>
+    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>CAMDEN</div></div>
+    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>CAMDEN</div></div>
+    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/6V7wXFP.jpeg" alt="Script Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>Script Lettering Hat</div></div>
   </div>
 </section>
+
 <!-- ─── REVIEWS ─── -->
 <section id="reviews">
   <div class="reviews-header">
     <div class="section-eyebrow">Testimonials</div>
     <h2 class="section-title">What <em>Customers</em> Say</h2>
   </div>
-
   <div class="reviews-carousel-wrap">
     <div class="reviews-track-container">
       <div class="reviews-track" id="reviewsTrack">
-
-
         <div class="review-card">
           <div class="review-stars">★★★★★</div>
           <div class="review-text">"Ordered a sticker pack and the quality is incredible — vibrant, durable, and the design came out perfectly. Fast shipping too!"</div>
-          <div class="review-author">
-            <div class="review-avatar">A</div>
-            <div>
-              <div class="review-name">Aaliyah T.</div>
-              <div class="review-product">Custom Sticker Pack</div>
-            </div>
-          </div>
+          <div class="review-author"><div class="review-avatar">A</div><div><div class="review-name">Aaliyah T.</div><div class="review-product">Custom Sticker Pack</div></div></div>
         </div>
-
         <div class="review-card">
           <div class="review-stars">★★★★★</div>
           <div class="review-text">"Got matching hats for my partner and me. They came out stunning. The craftsmanship really shows — worth every penny."</div>
-          <div class="review-author">
-            <div class="review-avatar">R</div>
-            <div>
-              <div class="review-name">Ryan &amp; Priya</div>
-              <div class="review-product">Matching Hat Set</div>
-            </div>
-          </div>
+          <div class="review-author"><div class="review-avatar">R</div><div><div class="review-name">Ryan &amp; Priya</div><div class="review-product">Matching Hat Set</div></div></div>
         </div>
-
-       
-
         <div class="review-card">
           <div class="review-stars">★★★★★</div>
           <div class="review-text">"The communication was great, turnaround was fast, and the hat was exactly what I described. Precision in every sense of the word!"</div>
-          <div class="review-author">
-            <div class="review-avatar">D</div>
-            <div>
-              <div class="review-name">Dante L.</div>
-              <div class="review-product">Custom Bucket Hat</div>
-            </div>
-          </div>
+          <div class="review-author"><div class="review-avatar">D</div><div><div class="review-name">Dante L.</div><div class="review-product">Custom Bucket Hat</div></div></div>
         </div>
-
       </div>
     </div>
-
-    
+    <div class="reviews-controls">
+      <button class="review-arrow" onclick="prevReview()">←</button>
+      <div class="reviews-dots" id="reviewDots"></div>
+      <button class="review-arrow" onclick="nextReview()">→</button>
+    </div>
+  </div>
 </section>
 
 <!-- ─── CONTACT ─── -->
@@ -1604,7 +998,6 @@
     <div class="section-eyebrow">Get in Touch</div>
     <h2 class="section-title">Let's Create <em>Something</em></h2>
     <p class="contact-tagline">Have a custom idea? Want to place an order? Just want to say hello? We'd love to hear from you. Every great piece starts with a conversation.</p>
-
     <div class="contact-socials">
       <a href="https://instagram.com" target="_blank" class="social-link" title="Instagram">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
@@ -1612,11 +1005,7 @@
       <a href="#" class="social-link" title="TikTok">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg>
       </a>
-      <a href="#" class="social-link" title="Pinterest">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.65 7.86 6.39 9.29-.09-.78-.17-1.98.04-2.83.18-.76 1.23-5.22 1.23-5.22s-.31-.63-.31-1.56c0-1.47.85-2.56 1.91-2.56.9 0 1.34.68 1.34 1.49 0 .91-.58 2.27-.88 3.53-.25 1.06.53 1.92 1.57 1.92 1.88 0 3.14-2.4 3.14-5.24 0-2.16-1.46-3.67-3.55-3.67-2.42 0-3.84 1.82-3.84 3.71 0 .73.28 1.52.63 1.94.07.08.08.16.06.25l-.24.96c-.04.15-.13.18-.3.11-1.12-.5-1.82-2.06-1.82-3.33 0-2.7 1.96-5.18 5.65-5.18 2.96 0 5.26 2.11 5.26 4.93 0 2.94-1.85 5.3-4.42 5.3-.86 0-1.67-.45-1.95-.97l-.53 1.97c-.19.74-.71 1.67-1.06 2.23.8.25 1.65.38 2.52.38 5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
-      </a>
     </div>
-
     <div class="contact-detail">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
       precisioncraftstudios@gmail.com
@@ -1626,22 +1015,12 @@
       @precisioncraftstudios
     </div>
   </div>
-
   <div class="contact-form">
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">First Name</label>
-        <input type="text" class="form-input" placeholder="Your first name">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Last Name</label>
-        <input type="text" class="form-input" placeholder="Your last name">
-      </div>
+      <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" placeholder="Your first name"></div>
+      <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" placeholder="Your last name"></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-input" placeholder="your@email.com">
-    </div>
+    <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="your@email.com"></div>
     <div class="form-group">
       <label class="form-label">I'm interested in</label>
       <select class="form-select">
@@ -1653,10 +1032,7 @@
         <option>Collaboration</option>
       </select>
     </div>
-    <div class="form-group">
-      <label class="form-label">Tell Us About Your Vision</label>
-      <textarea class="form-textarea" placeholder="Describe your idea, colors, design elements, or any details you have in mind…"></textarea>
-    </div>
+    <div class="form-group"><label class="form-label">Tell Us About Your Vision</label><textarea class="form-textarea" placeholder="Describe your idea, colors, design elements, or any details you have in mind…"></textarea></div>
     <button class="form-submit" onclick="submitForm()">Send Message →</button>
     <div class="form-success" id="formSuccess">✓ Message received! We'll be in touch within 24 hours.</div>
   </div>
@@ -1666,7 +1042,7 @@
 <footer>
   <div class="footer-top">
     <div class="footer-brand">
-      <a href="#" class="nav-logo">
+      <a href="#" class="nav-logo" style="margin-bottom:16px;">
         <svg viewBox="0 0 100 120" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
           <path d="M62 18 C72 14, 82 18, 82 28 C82 38, 72 44, 62 42 C54 40, 50 34, 50 28 C50 20, 54 16, 62 18Z" stroke="white" stroke-width="4.5" fill="none"/>
           <circle cx="70" cy="26" r="3.5" fill="white"/>
@@ -1679,33 +1055,9 @@
       </a>
       <p>Handmade with heart, designed with precision. We create custom goods that bring joy to everyday life.</p>
     </div>
-    <div class="footer-col">
-      <h4>Shop</h4>
-      <ul>
-        <li><a href="#shop">Custom Hats</a></li>
-        <li><a href="#shop">Custom Stickers</a></li>
-        <li><a href="#shop">Bundle Sets</a></li>
-        <li><a href="#shop">New Arrivals</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Studio</h4>
-      <ul>
-        <li><a href="#about">Our Story</a></li>
-        <li><a href="#gallery">Gallery</a></li>
-        <li><a href="#reviews">Reviews</a></li>
-        <li><a href="#contact">Custom Orders</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Support</h4>
-      <ul>
-        <li><a href="#contact">Contact Us</a></li>
-        <li><a href="#">Shipping Info</a></li>
-        <li><a href="#">Returns</a></li>
-        <li><a href="#">FAQs</a></li>
-      </ul>
-    </div>
+    <div class="footer-col"><h4>Shop</h4><ul><li><a href="#shop">Custom Hats</a></li><li><a href="#shop">Custom Stickers</a></li><li><a href="#shop">Bundle Sets</a></li><li><a href="#shop">New Arrivals</a></li></ul></div>
+    <div class="footer-col"><h4>Studio</h4><ul><li><a href="#about">Our Story</a></li><li><a href="#gallery">Gallery</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#contact">Custom Orders</a></li></ul></div>
+    <div class="footer-col"><h4>Support</h4><ul><li><a href="#contact">Contact Us</a></li><li><a href="#">Shipping Info</a></li><li><a href="#">Returns</a></li><li><a href="#">FAQs</a></li></ul></div>
   </div>
   <div class="footer-bottom">
     <p>© 2025 Precision Craft Studios. All rights reserved.</p>
@@ -1738,7 +1090,12 @@
   }
 
   // ─── CART STATE ───
-  let cart = [];
+  // Load cart from localStorage on page load
+  let cart = JSON.parse(localStorage.getItem('pcs_cart')) || [];
+
+  function saveCart() {
+    localStorage.setItem('pcs_cart', JSON.stringify(cart));
+  }
 
   function openCart() {
     document.getElementById('cartOverlay').classList.add('open');
@@ -1753,31 +1110,29 @@
 
   function addToCart(btn, name, price) {
     const existing = cart.find(i => i.name === name);
-
-    if (existing) existing.qty++;
-    else cart.push({ name, price, qty: 1 });
-
-    localStorage.setItem("cart", JSON.stringify(cart));
+    if (existing) {
+      existing.qty++;
+    } else {
+      cart.push({ name, price, qty: 1 });
+    }
+    saveCart();
 
     btn.classList.add('adding');
     btn.textContent = '✓ Added';
-
     setTimeout(() => {
       btn.classList.remove('adding');
-      btn.innerHTML = `
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg> Add`;
+      btn.textContent = 'Add';
     }, 1500);
 
     updateCartCount();
-    showToast(`${name} added to cart!`);
+    showToast(name + ' added to cart!');
   }
 
   function updateCartCount() {
     const total = cart.reduce((s, i) => s + i.qty, 0);
     document.getElementById('cartCount').textContent = total;
+    const mobileCount = document.getElementById('mobileCartCount');
+    if (mobileCount) mobileCount.textContent = total;
   }
 
   function renderCart() {
@@ -1791,22 +1146,20 @@
     }
 
     const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
-    totalEl.textContent = `$${total.toFixed(2)}`;
+    totalEl.textContent = '$' + total.toFixed(2);
 
     el.innerHTML = cart.map((item, idx) => `
       <div class="cart-item">
         <div class="cart-item-img">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8ECAAE" stroke-width="1.5">
-            <circle cx="12" cy="12" r="10"/>
-          </svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8ECAAE" stroke-width="1.5"><circle cx="12" cy="12" r="10"/></svg>
         </div>
         <div class="cart-item-info">
           <div class="cart-item-name">${item.name}</div>
           <div class="cart-item-price">$${item.price.toFixed(2)}</div>
           <div class="cart-item-qty">
-            <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
+            <button class="qty-btn" onclick="changeQty(${idx}, -1)">−</button>
             <span class="qty-val">${item.qty}</span>
-            <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+            <button class="qty-btn" onclick="changeQty(${idx}, 1)">+</button>
           </div>
         </div>
         <button class="cart-item-remove" onclick="removeItem(${idx})">✕</button>
@@ -1817,24 +1170,32 @@
   function changeQty(idx, delta) {
     cart[idx].qty += delta;
     if (cart[idx].qty <= 0) cart.splice(idx, 1);
+    saveCart();
     updateCartCount();
     renderCart();
   }
 
   function removeItem(idx) {
     cart.splice(idx, 1);
+    saveCart();
     updateCartCount();
     renderCart();
+  }
+
+  function proceedToCheckout() {
+    if (!cart.length) {
+      showToast('Your cart is empty!');
+      return;
+    }
+    window.location.href = 'checkout.html';
   }
 
   // ─── PRODUCT FILTER ───
   function filterProducts(cat, btn) {
     document.querySelectorAll('#shop .filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
     document.querySelectorAll('#productsGrid .product-card').forEach(card => {
-      const show = cat === 'all' || card.dataset.category === cat;
-      card.style.display = show ? '' : 'none';
+      card.style.display = (cat === 'all' || card.dataset.category === cat) ? '' : 'none';
     });
   }
 
@@ -1842,7 +1203,6 @@
   function filterGallery(cat, btn) {
     document.querySelectorAll('#gallery .filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-
     document.querySelectorAll('#galleryGrid .gallery-item').forEach(item => {
       const show = cat === 'all' || item.dataset.cat === cat;
       item.style.opacity = show ? '1' : '0.2';
@@ -1850,141 +1210,93 @@
     });
   }
 
-  // ─── REVIEWS CAROUSEL (TRUE INFINITE LOOP FIXED) ───
- 
-  <script>
-  // ─── REVIEWS CAROUSEL (FINAL STABLE VERSION) ───
-  let index = 1;
-  let track, cards, dots;
-  let cardWidth = 0;
+  // ─── REVIEWS CAROUSEL ───
+  let reviewIndex = 1;
+  let reviewTrack, reviewCards, reviewCardWidth;
 
   function initReviews() {
-    track = document.getElementById("reviewsTrack");
-    dots = document.getElementById("reviewDots");
+    reviewTrack = document.getElementById('reviewsTrack');
+    const dotsContainer = document.getElementById('reviewDots');
+    reviewCards = Array.from(reviewTrack.querySelectorAll('.review-card'));
+    if (!reviewTrack || reviewCards.length === 0) return;
 
-    cards = Array.from(document.querySelectorAll(".review-card"));
-    if (!track || cards.length === 0) return;
+    // Clone first and last for infinite loop
+    const firstClone = reviewCards[0].cloneNode(true);
+    const lastClone = reviewCards[reviewCards.length - 1].cloneNode(true);
+    reviewTrack.appendChild(firstClone);
+    reviewTrack.insertBefore(lastClone, reviewCards[0]);
 
-    // clones
-    const firstClone = cards[0].cloneNode(true);
-    const lastClone = cards[cards.length - 1].cloneNode(true);
+    reviewCardWidth = reviewCards[0].getBoundingClientRect().width + 24;
+    reviewTrack.style.transition = 'none';
+    reviewTrack.style.transform = `translateX(-${reviewIndex * reviewCardWidth}px)`;
 
-    track.appendChild(firstClone);
-    track.insertBefore(lastClone, cards[0]);
-
-    updateWidth();
-    createDots();
-
-    // start on real first card
-    track.style.transform = `translateX(-${index * cardWidth}px)`;
-  }
-
-  function updateWidth() {
-    const card = document.querySelector(".review-card");
-
-    // adjust if you change spacing
-    const gap = 24;
-    cardWidth = card.getBoundingClientRect().width + gap;
-  }
-
-  function createDots() {
-    if (!dots) return;
-
-    dots.innerHTML = "";
-
-    cards.forEach((_, i) => {
-      const dot = document.createElement("div");
-      dot.className = "review-dot" + (i === 0 ? " active" : "");
-      dot.onclick = () => goTo(i + 1);
-      dots.appendChild(dot);
+    // Build dots
+    dotsContainer.innerHTML = '';
+    reviewCards.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'review-dot' + (i === 0 ? ' active' : '');
+      dot.onclick = () => goToReview(i + 1);
+      dotsContainer.appendChild(dot);
     });
   }
 
-  function goTo(i) {
-    index = i;
-
-    track.style.transition = "transform 0.5s ease";
-    track.style.transform = `translateX(-${index * cardWidth}px)`;
-
-    track.addEventListener("transitionend", handleLoop);
-    updateDots();
+  function goToReview(i) {
+    reviewIndex = i;
+    reviewTrack.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1)';
+    reviewTrack.style.transform = `translateX(-${reviewIndex * reviewCardWidth}px)`;
+    reviewTrack.addEventListener('transitionend', handleReviewLoop, { once: true });
+    updateReviewDots();
   }
 
-  function nextReview() {
-    goTo(index + 1);
-  }
+  function nextReview() { goToReview(reviewIndex + 1); }
+  function prevReview() { goToReview(reviewIndex - 1); }
 
-  function prevReview() {
-    goTo(index - 1);
-  }
-
-  function handleLoop() {
-    track.removeEventListener("transitionend", handleLoop);
-
-    const total = cards.length;
-
-    if (index === 0) {
-      track.style.transition = "none";
-      index = total;
-      track.style.transform = `translateX(-${index * cardWidth}px)`;
+  function handleReviewLoop() {
+    const total = reviewCards.length;
+    if (reviewIndex === 0) {
+      reviewTrack.style.transition = 'none';
+      reviewIndex = total;
+      reviewTrack.style.transform = `translateX(-${reviewIndex * reviewCardWidth}px)`;
     }
-
-    if (index === total + 1) {
-      track.style.transition = "none";
-      index = 1;
-      track.style.transform = `translateX(-${index * cardWidth}px)`;
+    if (reviewIndex === total + 1) {
+      reviewTrack.style.transition = 'none';
+      reviewIndex = 1;
+      reviewTrack.style.transform = `translateX(-${reviewIndex * reviewCardWidth}px)`;
     }
-
-    updateDots();
+    updateReviewDots();
   }
 
-  function updateDots() {
-    const allDots = document.querySelectorAll(".review-dot");
-    let real = index - 1;
-
+  function updateReviewDots() {
+    const allDots = document.querySelectorAll('.review-dot');
+    let real = reviewIndex - 1;
     if (real < 0) real = allDots.length - 1;
     if (real >= allDots.length) real = 0;
-
-    allDots.forEach((d, i) => d.classList.toggle("active", i === real));
+    allDots.forEach((d, i) => d.classList.toggle('active', i === real));
   }
 
-  window.addEventListener("load", initReviews);
-</script>
-  
-<!-- your other scripts -->
-<script src="script.js"></script>
+  // ─── TOAST ───
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
 
-<!-- Tidio chat (PASTE THIS) -->
+  // ─── CONTACT FORM ───
+  function submitForm() {
+    document.getElementById('formSuccess').style.display = 'block';
+    setTimeout(() => document.getElementById('formSuccess').style.display = 'none', 4000);
+  }
+
+  // ─── INIT ───
+  window.addEventListener('load', () => {
+    updateCartCount();
+    initReviews();
+  });
+</script>
+
+<!-- Tidio chat -->
 <script src="//code.tidio.co/zvrpgoeuir9ivzlpznjnox2aqipgjbla.js" async></script>
 
-<button onclick="addToCart({name:'Product Name', price:50})">
-Add to Cart
-</button>
-
-  <script>
-function addToCart(product) {
-
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-  let existing = cart.find(i => i.name === product.name);
-
-  if (existing) {
-    existing.qty += 1;
-  } else {
-    cart.push({
-      name: product.name,
-      price: product.price,
-      qty: 1
-    });
-  }
-
-  localStorage.setItem("cart", JSON.stringify(cart));
-}
-</script>
-  
 </body>
-</html>
-  
-</body>
-  <script src="script.js"></script>
 </html>
