@@ -3,129 +3,264 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Checkout</title>
-
-<script src="https://www.paypal.com/sdk/js?client-id=AbXrEojdTjfYNt3CrJ4g-UyVEyW-WP5iH-FWpXcCx6Fl6Xoir3sW7Canw8JE_M2cXF5mBYbgmDbV4tva&currency=USD"></script>
-
-  <div id="checkoutItems"></div>
-<div id="checkoutTotal"></div>
-<div id="paypal-button-container"></div>
-  
+<title>Checkout – Precision Craft Studios</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-body { font-family: Arial; margin:0; padding:0; }
-.container { max-width:700px; margin:100px auto; padding:20px; }
-.item { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #eee; }
-.total { margin-top:20px; font-size:20px; font-weight:bold; }
-.form { margin-top:20px; display:flex; flex-direction:column; gap:10px; }
-input, textarea { padding:10px; border:1px solid #ccc; }
+  :root {
+    --mint: #8ECAAE;
+    --mint-light: #C8E8D9;
+    --mint-pale: #EDF7F2;
+    --mint-deep: #5FAD8A;
+    --white: #FFFFFF;
+    --off-white: #F8FCFA;
+    --black: #111111;
+    --black-soft: #222222;
+    --gray: #888888;
+    --gray-light: #E8E8E8;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-ui: 'Jost', sans-serif;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow: 0 4px 24px rgba(0,0,0,0.07);
+    --shadow-lg: 0 12px 48px rgba(0,0,0,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-ui); background: var(--off-white); color: var(--black-soft); font-weight: 300; min-height: 100vh; }
+
+  /* ─── NAV ─── */
+  nav {
+    background: var(--white);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5%;
+    height: 72px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .nav-logo-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+  .nav-brand { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--black); line-height: 1.05; display: flex; flex-direction: column; }
+  .nav-brand span { font-size: 0.62rem; font-family: var(--font-ui); font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gray); margin-top: 1px; }
+  .back-link { font-size: 0.78rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black-soft); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color var(--transition); }
+  .back-link:hover { color: var(--mint-deep); }
+
+  /* ─── LAYOUT ─── */
+  .checkout-page { max-width: 1100px; margin: 48px auto; padding: 0 24px; display: grid; grid-template-columns: 1fr 420px; gap: 32px; align-items: start; }
+  @media (max-width: 800px) { .checkout-page { grid-template-columns: 1fr; } }
+
+  /* ─── PANELS ─── */
+  .panel { background: var(--white); border-radius: 6px; box-shadow: var(--shadow); padding: 32px; }
+  .panel-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 400; color: var(--black); margin-bottom: 24px; }
+  .panel-title span { color: var(--mint-deep); font-style: italic; }
+
+  /* ─── ORDER SUMMARY ─── */
+  .order-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--gray-light); }
+  .order-item:last-of-type { border-bottom: none; }
+  .order-item-left { display: flex; flex-direction: column; }
+  .order-item-name { font-size: 0.9rem; font-weight: 500; color: var(--black); }
+  .order-item-qty { font-size: 0.78rem; color: var(--gray); margin-top: 2px; }
+  .order-item-price { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--black); }
+  .order-divider { height: 1px; background: var(--gray-light); margin: 16px 0; }
+  .order-total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .order-total-label { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); }
+  .order-total-price { font-family: var(--font-display); font-size: 2rem; font-weight: 600; color: var(--black); }
+  .empty-cart-msg { text-align: center; padding: 40px 0; color: var(--gray); font-family: var(--font-display); font-style: italic; font-size: 1rem; }
+  .empty-cart-msg a { color: var(--mint-deep); text-decoration: none; font-style: normal; font-family: var(--font-ui); font-size: 0.82rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; display: inline-block; margin-top: 12px; border-bottom: 1px solid var(--mint-deep); }
+
+  /* ─── CUSTOMER FORM ─── */
+  .form-group { margin-bottom: 18px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+  .form-label { display: block; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); font-weight: 500; margin-bottom: 8px; }
+  .form-input, .form-textarea {
+    width: 100%; padding: 12px 16px; border: 1.5px solid var(--gray-light); border-radius: 3px;
+    font-family: var(--font-ui); font-size: 0.9rem; color: var(--black); background: var(--white);
+    outline: none; transition: border-color var(--transition); font-weight: 300;
+  }
+  .form-input:focus, .form-textarea:focus { border-color: var(--mint); }
+  .form-textarea { resize: vertical; min-height: 90px; }
+
+  /* ─── PAYPAL AREA ─── */
+  .paypal-section { margin-top: 28px; }
+  .paypal-label { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; color: var(--gray); margin-bottom: 14px; text-align: center; }
+  #paypal-button-container { min-height: 50px; }
+  .paypal-loading { text-align: center; color: var(--gray); font-size: 0.85rem; padding: 16px; }
+
+  /* ─── SECURE BADGE ─── */
+  .secure-badge { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 20px; color: var(--gray); font-size: 0.75rem; letter-spacing: 0.06em; }
+  .secure-badge svg { color: var(--mint-deep); }
 </style>
 </head>
-  
-<script src="checkout.js"></script>
-  
 <body>
 
-<div class="container">
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="https://i.imgur.com/v8Omcnw.png" alt="Precision Craft Studios Logo" class="nav-logo-img">
+    <div class="nav-brand">Precision Craft Studios<span>Crafting What Brings Joy</span></div>
+  </a>
+  <a href="index.html" class="back-link">← Back to Shop</a>
+</nav>
 
-  <h2>Your Cart</h2>
-  <div id="checkoutItems"></div>
-  <div class="total" id="checkoutTotal"></div>
+<div class="checkout-page">
 
-  <div class="form">
-    <input id="name" placeholder="Full Name">
-    <input id="email" placeholder="Email">
-    <input id="phone" placeholder="Phone">
-    <textarea id="address" placeholder="Address"></textarea>
+  <!-- LEFT: Customer Info -->
+  <div class="panel">
+    <div class="panel-title">Your <span>Details</span></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">First Name</label>
+        <input type="text" id="firstName" class="form-input" placeholder="Jane">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Last Name</label>
+        <input type="text" id="lastName" class="form-input" placeholder="Doe">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email Address</label>
+      <input type="email" id="email" class="form-input" placeholder="you@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Phone (optional)</label>
+      <input type="tel" id="phone" class="form-input" placeholder="+1 (555) 000-0000">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Shipping Address</label>
+      <textarea id="address" class="form-textarea" placeholder="123 Main St, City, State, ZIP"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Order Notes (optional)</label>
+      <textarea id="notes" class="form-textarea" placeholder="Any special requests, custom design notes, or instructions…" style="min-height:70px;"></textarea>
+    </div>
   </div>
 
-  <div id="paypal-button-container" style="margin-top:20px;"></div>
+  <!-- RIGHT: Order Summary + PayPal -->
+  <div>
+    <div class="panel">
+      <div class="panel-title">Order <span>Summary</span></div>
+      <div id="checkoutItems"><div class="paypal-loading">Loading your cart…</div></div>
+      <div class="order-divider"></div>
+      <div class="order-total-row">
+        <span class="order-total-label">Total</span>
+        <span class="order-total-price" id="checkoutTotal">$0.00</span>
+      </div>
+
+      <div class="paypal-section">
+        <div class="paypal-label">Complete your payment securely with PayPal</div>
+        <div id="paypal-button-container"><div class="paypal-loading">Loading payment…</div></div>
+      </div>
+
+      <div class="secure-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        Secured by PayPal
+      </div>
+    </div>
+  </div>
 
 </div>
 
+<!-- PayPal SDK — loaded LAST so DOM is ready -->
+<script src="https://www.paypal.com/sdk/js?client-id=AbXrEojdTjfYNt3CrJ4g-UyVEyW-WP5iH-FWpXcCx6Fl6Xoir3sW7Canw8JE_M2cXF5mBYbgmDbV4tva&currency=USD"></script>
 <script>
-
-window.addEventListener("DOMContentLoaded", () => {
-
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-  const itemsContainer = document.getElementById("checkoutItems");
-  const totalContainer = document.getElementById("checkoutTotal");
+  // ─── Load cart from localStorage ───
+  const cart = JSON.parse(localStorage.getItem('pcs_cart')) || [];
 
   function getTotal() {
     return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
   }
 
-  function render() {
-
-    if (!cart.length) {
-      itemsContainer.innerHTML = "<p>Cart is empty</p>";
-      totalContainer.innerText = "Total: $0.00";
-      return;
-    }
-
-    itemsContainer.innerHTML = cart.map(i => `
-      <div class="item">
-        <span>${i.name} x${i.qty}</span>
-        <span>$${(i.price * i.qty).toFixed(2)}</span>
-      </div>
-    `).join("");
-
-    totalContainer.innerText = "Total: $" + getTotal().toFixed(2);
-  }
-
-  function customer() {
+  function getCustomer() {
     return {
-      name: document.getElementById("name").value || "",
-      email: document.getElementById("email").value || "",
-      phone: document.getElementById("phone").value || "",
-      address: document.getElementById("address").value || ""
+      name: (document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value).trim(),
+      email: document.getElementById('email').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      address: document.getElementById('address').value.trim(),
+      notes: document.getElementById('notes').value.trim()
     };
   }
 
-  function loadPayPal() {
+  function renderOrderSummary() {
+    const container = document.getElementById('checkoutItems');
+    const totalEl = document.getElementById('checkoutTotal');
 
-    if (!window.paypal) {
-      console.error("PayPal not loaded");
+    if (!cart.length) {
+      container.innerHTML = `
+        <div class="empty-cart-msg">
+          Your cart is empty.<br>
+          <a href="index.html">← Return to shop</a>
+        </div>`;
+      totalEl.textContent = '$0.00';
+      return false;
+    }
+
+    container.innerHTML = cart.map(item => `
+      <div class="order-item">
+        <div class="order-item-left">
+          <div class="order-item-name">${item.name}</div>
+          <div class="order-item-qty">Qty: ${item.qty}</div>
+        </div>
+        <div class="order-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+      </div>
+    `).join('');
+
+    totalEl.textContent = '$' + getTotal().toFixed(2);
+    return true;
+  }
+
+  function initPayPal() {
+    if (typeof paypal === 'undefined') {
+      document.getElementById('paypal-button-container').innerHTML =
+        '<div class="paypal-loading">Payment unavailable — please refresh the page.</div>';
       return;
     }
 
     paypal.Buttons({
+      style: { layout: 'vertical', color: 'black', shape: 'rect', label: 'pay' },
 
-      createOrder: (data, actions) => {
+      createOrder: function(data, actions) {
+        const total = getTotal();
+        if (total <= 0) {
+          alert('Your cart is empty. Please add items before checking out.');
+          return Promise.reject('Empty cart');
+        }
         return actions.order.create({
           purchase_units: [{
-            amount: {
-              value: getTotal().toFixed(2)
-            }
+            amount: { value: total.toFixed(2) },
+            description: 'Precision Craft Studios Order'
           }]
         });
       },
 
-      onApprove: (data, actions) => {
-        return actions.order.capture().then(details => {
-
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
           const order = {
-            customer: customer(),
+            orderId: Date.now(),
+            customer: getCustomer(),
             cart: cart,
-            payment: details,
-            orderId: Date.now()
+            total: getTotal().toFixed(2),
+            payment: details
           };
-
-          localStorage.setItem("lastOrder", JSON.stringify(order));
-          localStorage.removeItem("cart");
-
-          window.location.href = "success.html";
+          localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
+          localStorage.removeItem('pcs_cart');
+          window.location.href = 'success.html';
         });
-      }
+      },
 
-    }).render("#paypal-button-container");
+      onError: function(err) {
+        console.error('PayPal error:', err);
+        alert('There was a problem processing your payment. Please try again.');
+      }
+    }).render('#paypal-button-container');
   }
 
-  render();
-  loadPayPal();
-
-});
-
+  // ─── INIT ───
+  const hasItems = renderOrderSummary();
+  if (hasItems) {
+    initPayPal();
+  } else {
+    document.getElementById('paypal-button-container').innerHTML = '';
+  }
 </script>
 
 </body>
