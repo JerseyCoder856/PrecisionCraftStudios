@@ -28,6 +28,14 @@
       ${order.cart.map(i => `<p>${i.name} x${i.qty}</p>`).join("")}
     `;
   </script>
+<script>
+const order = JSON.parse(localStorage.getItem("lastOrder"));
 
+document.body.innerHTML = order
+  ? `<h1>Order #${order.orderId}</h1>`
+  : `<h1>No order found</h1>`;
+</script>
+
+  
 </body>
 </html>
