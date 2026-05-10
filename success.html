@@ -1,41 +1,199 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Order Success</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed – Precision Craft Studios</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --mint: #8ECAAE;
+    --mint-light: #C8E8D9;
+    --mint-pale: #EDF7F2;
+    --mint-deep: #5FAD8A;
+    --white: #FFFFFF;
+    --off-white: #F8FCFA;
+    --black: #111111;
+    --black-soft: #222222;
+    --gray: #888888;
+    --gray-light: #E8E8E8;
+    --font-display: 'Cormorant Garamond', serif;
+    --font-ui: 'Jost', sans-serif;
+    --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow: 0 4px 24px rgba(0,0,0,0.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-ui); background: var(--mint-pale); color: var(--black-soft); font-weight: 300; min-height: 100vh; }
 
+  /* ─── NAV ─── */
+  nav {
+    background: var(--white);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%; height: 72px;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .nav-logo-img { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; }
+  .nav-brand { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--black); line-height: 1.05; display: flex; flex-direction: column; }
+  .nav-brand span { font-size: 0.62rem; font-family: var(--font-ui); font-weight: 300; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gray); margin-top: 1px; }
+
+  /* ─── MAIN ─── */
+  .success-page { max-width: 680px; margin: 60px auto; padding: 0 24px; }
+
+  /* ─── CHECK ANIMATION ─── */
+  .check-wrap {
+    display: flex; align-items: center; justify-content: center;
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--mint); margin: 0 auto 28px;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+  @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .check-wrap svg { color: white; }
+
+  .success-header { text-align: center; margin-bottom: 36px; }
+  .success-title { font-family: var(--font-display); font-size: 2.8rem; font-weight: 300; color: var(--black); margin-bottom: 10px; }
+  .success-title em { color: var(--mint-deep); font-style: italic; }
+  .success-subtitle { font-size: 0.95rem; color: var(--gray); line-height: 1.75; max-width: 480px; margin: 0 auto; }
+
+  /* ─── ORDER CARD ─── */
+  .order-card { background: var(--white); border-radius: 6px; box-shadow: var(--shadow); padding: 32px; margin-bottom: 24px; }
+  .order-card-title { font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mint-deep); font-weight: 500; margin-bottom: 20px; }
+  .order-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  @media (max-width: 500px) { .order-meta { grid-template-columns: 1fr; } }
+  .meta-item {}
+  .meta-label { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gray); margin-bottom: 4px; }
+  .meta-value { font-size: 0.92rem; font-weight: 500; color: var(--black); }
+
+  .order-divider { height: 1px; background: var(--gray-light); margin: 20px 0; }
+
+  .order-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--gray-light); }
+  .order-item:last-of-type { border-bottom: none; }
+  .order-item-name { font-size: 0.88rem; font-weight: 500; color: var(--black); }
+  .order-item-qty { font-size: 0.75rem; color: var(--gray); }
+  .order-item-price { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; color: var(--black); }
+
+  .order-total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; }
+  .order-total-label { font-size: 0.82rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+  .order-total-price { font-family: var(--font-display); font-size: 1.8rem; font-weight: 600; color: var(--black); }
+
+  /* ─── CTA ─── */
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--black); color: var(--white);
+    padding: 14px 32px; border-radius: 2px;
+    font-family: var(--font-ui); font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    text-decoration: none; border: 2px solid var(--black);
+    transition: background var(--transition), transform var(--transition); cursor: pointer;
+  }
+  .btn-primary:hover { background: var(--mint-deep); border-color: var(--mint-deep); transform: translateY(-1px); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: transparent; color: var(--black);
+    padding: 14px 32px; border-radius: 2px;
+    font-family: var(--font-ui); font-size: 0.78rem; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    text-decoration: none; border: 2px solid var(--black);
+    transition: background var(--transition), transform var(--transition); cursor: pointer;
+  }
+  .btn-secondary:hover { background: var(--mint-pale); transform: translateY(-1px); }
+
+  /* ─── NO ORDER STATE ─── */
+  .no-order { text-align: center; padding: 60px 20px; }
+  .no-order p { color: var(--gray); font-size: 1rem; margin-bottom: 20px; }
+</style>
+</head>
 <body>
 
-  <section class="success-container">
-    <h1>🎉 Thank You for Your Order!</h1>
-    <p>Your order has been received and is being prepared.</p>
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="https://i.imgur.com/v8Omcnw.png" alt="Precision Craft Studios Logo" class="nav-logo-img">
+    <div class="nav-brand">Precision Craft Studios<span>Crafting What Brings Joy</span></div>
+  </a>
+</nav>
 
-    <div id="orderInfo"></div>
-  </section>
+<div class="success-page" id="successPage">
+  <!-- Filled by JS below -->
+</div>
 
-  <script>
-    const order = JSON.parse(localStorage.getItem("lastOrder"));
-
-    document.getElementById("orderInfo").innerHTML = `
-      <h3>Order #${order.orderId}</h3>
-
-      <h4>Customer</h4>
-      <p>${order.customer.name}</p>
-      <p>${order.customer.address}</p>
-
-      <h4>Items</h4>
-      ${order.cart.map(i => `<p>${i.name} x${i.qty}</p>`).join("")}
-    `;
-  </script>
 <script>
-const order = JSON.parse(localStorage.getItem("lastOrder"));
+  const order = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('pcs_lastOrder'));
+    } catch(e) {
+      return null;
+    }
+  })();
 
-document.body.innerHTML = order
-  ? `<h1>Order #${order.orderId}</h1>`
-  : `<h1>No order found</h1>`;
+  const page = document.getElementById('successPage');
+
+  if (!order) {
+    page.innerHTML = `
+      <div class="no-order">
+        <p>No order found. If you just placed an order, it was received!</p>
+        <a href="index.html" class="btn-primary">Return to Shop</a>
+      </div>`;
+  } else {
+    const itemsHTML = (order.cart || []).map(item => `
+      <div class="order-item">
+        <div>
+          <div class="order-item-name">${item.name}</div>
+          <div class="order-item-qty">Qty: ${item.qty}</div>
+        </div>
+        <div class="order-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+      </div>
+    `).join('');
+
+    const payerName = order.payment?.payer?.name
+      ? `${order.payment.payer.name.given_name} ${order.payment.payer.name.surname}`
+      : order.customer?.name || '—';
+
+    const payerEmail = order.payment?.payer?.email_address || order.customer?.email || '—';
+    const paypalId = order.payment?.id || '—';
+    const orderDate = new Date(order.orderId).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+    page.innerHTML = `
+      <div class="check-wrap">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+
+      <div class="success-header">
+        <h1 class="success-title">Order <em>Confirmed!</em></h1>
+        <p class="success-subtitle">Thank you for your order — we're already thinking about how to make it perfect. You'll hear from us soon!</p>
+      </div>
+
+      <div class="order-card">
+        <div class="order-card-title">Order Details</div>
+        <div class="order-meta">
+          <div class="meta-item"><div class="meta-label">Order #</div><div class="meta-value">${order.orderId}</div></div>
+          <div class="meta-item"><div class="meta-label">Date</div><div class="meta-value">${orderDate}</div></div>
+          <div class="meta-item"><div class="meta-label">Name</div><div class="meta-value">${payerName}</div></div>
+          <div class="meta-item"><div class="meta-label">Email</div><div class="meta-value">${payerEmail}</div></div>
+          ${order.customer?.address ? `<div class="meta-item" style="grid-column:span 2"><div class="meta-label">Ship To</div><div class="meta-value">${order.customer.address}</div></div>` : ''}
+          <div class="meta-item"><div class="meta-label">PayPal ID</div><div class="meta-value" style="font-size:0.78rem;word-break:break-all;">${paypalId}</div></div>
+        </div>
+
+        <div class="order-divider"></div>
+        <div class="order-card-title">Items Ordered</div>
+        ${itemsHTML}
+
+        <div class="order-total-row">
+          <span class="order-total-label">Total Paid</span>
+          <span class="order-total-price">$${order.total || '0.00'}</span>
+        </div>
+      </div>
+
+      <div class="cta-row">
+        <a href="index.html" class="btn-primary">Continue Shopping →</a>
+        <a href="index.html#contact" class="btn-secondary">Contact Us</a>
+      </div>
+    `;
+  }
 </script>
 
-  
 </body>
 </html>
