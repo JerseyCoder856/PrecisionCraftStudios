@@ -212,6 +212,7 @@
           <div class="order-item-left">
             <div class="order-item-name">${item.name}</div>
             <div class="order-item-qty">Qty: ${item.qty}</div>
+            ${item.customization ? `<div class="order-item-qty">${item.customization.type || 'Custom'} · ${item.customization.artworkCount || 0} uploaded artwork file(s)</div>` : ''}
           </div>
         </div>
         <div class="order-item-price">$${(item.price * item.qty).toFixed(2)}</div>
