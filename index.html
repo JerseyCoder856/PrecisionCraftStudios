@@ -589,43 +589,18 @@
 
   /* ─── GALLERY ─── */
   #gallery { background: var(--white); }
-  .gallery-header { display: flex; flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 40px; }
-  .gallery-filters { display: flex; gap: 10px; margin-top: -20px; }
+  .gallery-header { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 34px; }
+  .gallery-subtitle { color: var(--gray); line-height: 1.7; max-width: 640px; }
   .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-auto-rows: 120px;
-    gap: 14px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
   }
-  .gallery-item { border-radius: 4px; overflow: hidden; position: relative; cursor: pointer; transition: transform var(--transition); }
-  .gallery-item:hover { transform: scale(1.01); }
-  .gallery-item:hover .gallery-item-overlay { opacity: 1; }
-  .gallery-item:nth-child(1) { grid-column: span 5; grid-row: span 3; }
-  .gallery-item:nth-child(2) { grid-column: span 4; grid-row: span 2; }
-  .gallery-item:nth-child(3) { grid-column: span 3; grid-row: span 2; }
-  .gallery-item:nth-child(4) { grid-column: span 4; grid-row: span 2; background: var(--mint-light); }
-  .gallery-item:nth-child(5) { grid-column: span 3; grid-row: span 2; }
-  .gallery-item:nth-child(6) { grid-column: span 3; grid-row: span 2; background: var(--mint-light); }
-  .gallery-item:nth-child(7) { grid-column: span 4; grid-row: span 2; }
-  .gallery-item-inner { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 0; overflow: hidden; }
-  .gallery-item-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(17,17,17,0.55);
-    opacity: 0;
-    transition: opacity var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--white);
-    font-family: var(--font-display);
-    font-size: 0.95rem;
-    font-style: italic;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .gallery-item-overlay .tag { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; font-style: normal; font-family: var(--font-ui); background: var(--mint); padding: 3px 10px; border-radius: 2px; }
-  .gallery-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .gallery-item { border-radius: 8px; overflow: hidden; position: relative; background: var(--mint-pale); aspect-ratio: 1 / 1; box-shadow: var(--shadow); transition: transform var(--transition), box-shadow var(--transition); }
+  .gallery-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+  .gallery-item-inner { width: 100%; height: 100%; overflow: hidden; }
+  .gallery-img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform var(--transition); }
+  .gallery-item:hover .gallery-img { transform: scale(1.04); }
 
   /* ─── REVIEWS ─── */
   #reviews { background: var(--mint-pale); }
@@ -643,22 +618,29 @@
   .review-product { font-size: 0.72rem; color: var(--gray); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
 
   /* ─── CONTACT ─── */
-  #contact { background: var(--white); display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
-  .contact-tagline { font-size: 1rem; color: var(--gray); line-height: 1.8; margin-bottom: 36px; font-weight: 300; }
-  .contact-socials { display: flex; gap: 14px; margin-bottom: 36px; }
-  .social-link { width: 44px; height: 44px; border: 1.5px solid var(--black); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--black); text-decoration: none; transition: var(--transition); font-size: 1rem; }
+  #contact { background: linear-gradient(135deg, var(--white) 0%, var(--mint-pale) 100%); display: grid; grid-template-columns: minmax(0, .9fr) minmax(360px, 1.1fr); gap: 58px; align-items: center; }
+  .contact-info { max-width: 500px; }
+  .contact-tagline { font-size: 1rem; color: var(--gray); line-height: 1.8; margin-bottom: 32px; font-weight: 300; }
+  .contact-socials { display: flex; gap: 14px; margin-bottom: 32px; }
+  .social-link { width: 44px; height: 44px; border: 1.5px solid var(--black); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--black); text-decoration: none; transition: var(--transition); font-size: 1rem; background: rgba(255,255,255,.7); }
   .social-link:hover { background: var(--black); color: var(--white); transform: translateY(-2px); }
-  .contact-detail { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; color: var(--gray); font-size: 0.9rem; }
+  .contact-details { display: grid; gap: 12px; }
+  .contact-detail { display: flex; align-items: center; gap: 12px; color: var(--gray); font-size: 0.92rem; background: rgba(255,255,255,.72); border: 1px solid rgba(142,202,174,.28); border-radius: 999px; padding: 10px 14px; width: fit-content; }
   .contact-detail svg { width: 18px; height: 18px; color: var(--mint-deep); flex-shrink: 0; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .form-group { margin-bottom: 16px; }
-  .form-label { display: block; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); font-weight: 500; margin-bottom: 8px; }
-  .form-input, .form-textarea, .form-select { width: 100%; padding: 12px 16px; border: 1.5px solid var(--gray-light); border-radius: 2px; font-family: var(--font-ui); font-size: 0.9rem; color: var(--black); background: var(--white); outline: none; transition: border-color var(--transition); font-weight: 300; }
-  .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--mint); }
-  .form-textarea { resize: vertical; min-height: 120px; }
-  .form-submit { width: 100%; background: var(--black); color: var(--white); border: none; padding: 16px; border-radius: 2px; font-family: var(--font-ui); font-size: 0.78rem; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: background var(--transition), transform var(--transition); margin-top: 8px; }
-  .form-submit:hover { background: var(--mint-deep); transform: translateY(-1px); }
-  .form-success { display: none; background: var(--mint-pale); border: 1px solid var(--mint); border-radius: 3px; padding: 14px 20px; color: var(--mint-deep); font-size: 0.88rem; margin-top: 12px; text-align: center; }
+  .contact-form { background: rgba(255,255,255,.94); border: 1px solid rgba(142,202,174,.32); border-radius: 14px; box-shadow: var(--shadow-lg); padding: clamp(24px, 4vw, 38px); }
+  .contact-form-header { border-bottom: 1px solid var(--gray-light); margin-bottom: 24px; padding-bottom: 18px; }
+  .contact-form-kicker { color: var(--mint-deep); font-size: .68rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 8px; }
+  .contact-form-title { font-family: var(--font-display); font-size: clamp(1.65rem, 3vw, 2.25rem); font-weight: 400; color: var(--black); margin-bottom: 6px; }
+  .contact-form-subtitle { color: var(--gray); font-size: .9rem; line-height: 1.6; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { margin-bottom: 18px; }
+  .form-label { display: block; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); font-weight: 600; margin-bottom: 8px; }
+  .form-input, .form-textarea, .form-select { width: 100%; padding: 14px 16px; border: 1.5px solid var(--gray-light); border-radius: 8px; font-family: var(--font-ui); font-size: 0.94rem; color: var(--black); background: var(--off-white); outline: none; transition: border-color var(--transition), box-shadow var(--transition), background var(--transition); font-weight: 300; }
+  .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--mint-deep); box-shadow: 0 0 0 4px rgba(142,202,174,.18); background: var(--white); }
+  .form-textarea { resize: vertical; min-height: 136px; }
+  .form-submit { width: 100%; background: var(--black); color: var(--white); border: none; padding: 16px; border-radius: 8px; font-family: var(--font-ui); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: background var(--transition), transform var(--transition), box-shadow var(--transition); margin-top: 6px; }
+  .form-submit:hover { background: var(--mint-deep); transform: translateY(-1px); box-shadow: 0 12px 26px rgba(95,173,138,.25); }
+  .form-success { display: none; background: var(--mint-pale); border: 1px solid var(--mint); border-radius: 8px; padding: 14px 20px; color: var(--mint-deep); font-size: 0.88rem; margin-top: 14px; text-align: center; font-weight: 500; }
 
   /* ─── FOOTER ─── */
   footer { background: var(--black); color: var(--white); padding: 60px 5% 30px; }
@@ -705,16 +687,16 @@
     .about-visual-inner { width: 280px; }
     #contact { grid-template-columns: 1fr; }
     .footer-top { grid-template-columns: 1fr 1fr; }
-    .gallery-grid { grid-template-columns: repeat(6, 1fr); }
-    .gallery-item:nth-child(1) { grid-column: span 6; grid-row: span 2; }
-    .gallery-item:nth-child(n+2) { grid-column: span 3; grid-row: span 2; }
+    .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .nav-links, .nav-cart-btn { display: none; }
     .nav-hamburger { display: flex; }
   }
   @media (max-width: 600px) {
     section { padding: 70px 5%; }
     .footer-top { grid-template-columns: 1fr; }
-    .form-row { grid-template-columns: 1fr; }
+    .form-row, .gallery-grid { grid-template-columns: 1fr; }
+    .contact-form { padding: 22px; }
+    .contact-detail { width: 100%; border-radius: 14px; }
     .hero-visual { height: 260px; }
     .about-pillars { grid-template-columns: 1fr; }
   }
@@ -871,7 +853,7 @@
     <!-- PRODUCT 1.custom -->
     <div class="product-card" data-category="hats">
       <div class="product-image">
-        <img src="assets/hat-templates/whitehat.png" alt="Custom Signature Snapback's blank white-front trucker hat" onerror="this.onerror=null;this.src='assets/hat-templates/white.svg';">
+        <img src="whitehat.png" alt="Custom Signature Snapback's blank white-front trucker hat" onerror="this.onerror=null;this.src='assets/hat-templates/white.svg';">
         <span class="product-badge new">Custom</span>
         <div class="product-image-overlay"></div>
       </div>
@@ -1016,20 +998,17 @@
       <div class="section-eyebrow">Past Work</div>
       <h2 class="section-title">The <em>Gallery</em></h2>
     </div>
-    <div class="gallery-filters">
-      <button class="filter-btn active" onclick="filterGallery('all', this)">All Work</button>
-      <button class="filter-btn" onclick="filterGallery('hats', this)">Hats</button>
-      <button class="filter-btn" onclick="filterGallery('stickers', this)">Stickers</button>
-    </div>
+    <p class="gallery-subtitle">A clean visual showcase of finished snapback work, using the current product photography in a balanced two-row layout.</p>
   </div>
   <div class="gallery-grid" id="galleryGrid">
-    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>CAMDEN</div></div>
-    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/6V7wXFP.jpeg" alt="Script Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>Script Lettering Hat</div></div>
-    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>CAMDEN</div></div>
-    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>CAMDEN</div></div>
-    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>CAMDEN</div></div>
-    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/Z0i6reG.jpeg" alt="Floral Series Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>CAMDEN</div></div>
-    <div class="gallery-item" data-cat="hats"><div class="gallery-item-inner"><img src="https://i.imgur.com/6V7wXFP.jpeg" alt="Script Hat" class="gallery-img"></div><div class="gallery-item-overlay"><span class="tag">Hats</span>Script Lettering Hat</div></div>
+    <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/S7gn8BC.jpeg" alt="CAMDEN Signature Snapback" class="gallery-img"></div></div>
+    <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/XmdDdAC.jpeg" alt="PUERTO RICO Signature Snapback" class="gallery-img"></div></div>
+    <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/IRw2XyS.jpeg" alt="CAMDEN Signature Snapback with green brim" class="gallery-img"></div></div>
+    <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/uBWFn2d.jpeg" alt="PR Puerto Rico Signature Snapback" class="gallery-img"></div></div>
+    <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/S7gn8BC.jpeg" alt="CAMDEN Signature Snapback alternate showcase" class="gallery-img"></div></div>
+    <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/XmdDdAC.jpeg" alt="PUERTO RICO Signature Snapback alternate showcase" class="gallery-img"></div></div>
+    <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/IRw2XyS.jpeg" alt="CAMDEN Signature Snapback green brim alternate showcase" class="gallery-img"></div></div>
+    <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/uBWFn2d.jpeg" alt="PR Puerto Rico Signature Snapback alternate showcase" class="gallery-img"></div></div>
   </div>
 </section>
 
@@ -1072,16 +1051,23 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12a4 4 0 104 4V4a5 5 0 005 5"/></svg>
       </a>
     </div>
-    <div class="contact-detail">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-      precisioncraftstudios@gmail.com
-    </div>
-    <div class="contact-detail">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/></svg>
-      @precisioncraftstudios
+    <div class="contact-details">
+      <div class="contact-detail">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        precisioncraftstudios@gmail.com
+      </div>
+      <div class="contact-detail">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/></svg>
+        @precisioncraftstudios
+      </div>
     </div>
   </div>
   <div class="contact-form">
+    <div class="contact-form-header">
+      <div class="contact-form-kicker">Custom Order Intake</div>
+      <h3 class="contact-form-title">Tell us about your project</h3>
+      <p class="contact-form-subtitle">Share the essentials below and we’ll follow up with next steps, pricing, and timing.</p>
+    </div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" placeholder="Your first name"></div>
       <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" placeholder="Your last name"></div>
