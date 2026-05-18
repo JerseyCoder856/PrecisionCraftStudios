@@ -55,9 +55,12 @@
   .panel-title span { color: var(--mint-deep); font-style: italic; }
 
   /* ─── ORDER SUMMARY ─── */
-  .order-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--gray-light); }
+  .order-item { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--gray-light); }
   .order-item:last-of-type { border-bottom: none; }
-  .order-item-left { display: flex; flex-direction: column; }
+  .order-item-main { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .order-item-img { width: 54px; height: 54px; flex-shrink: 0; border-radius: 4px; background: var(--mint-pale); overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .order-item-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .order-item-left { display: flex; flex-direction: column; min-width: 0; }
   .order-item-name { font-size: 0.9rem; font-weight: 500; color: var(--black); }
   .order-item-qty { font-size: 0.78rem; color: var(--gray); margin-top: 2px; }
   .order-item-price { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--black); }
@@ -164,7 +167,11 @@
 <script src="https://www.paypal.com/sdk/js?client-id=AbXrEojdTjfYNt3CrJ4g-UyVEyW-WP5iH-FWpXcCx6Fl6Xoir3sW7Canw8JE_M2cXF5mBYbgmDbV4tva&currency=USD"></script>
 <script>
   // ─── Load cart from localStorage ───
-  const cart = JSON.parse(localStorage.getItem('pcs_cart')) || [];
+  const quantityEnabledProducts = ['Custom Sticker Pack', 'Logo Sticker Pack', "Custom Signature Snapback's"];
+  const cart = (JSON.parse(localStorage.getItem('pcs_cart')) || []).map(item =>
+    quantityEnabledProducts.includes(item.name) || item.allowQuantity ? item : { ...item, qty: 1, allowQuantity: false }
+  );
+  localStorage.setItem('pcs_cart', JSON.stringify(cart));
 
   function getTotal() {
     return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
@@ -194,15 +201,23 @@
       return false;
     }
 
-    container.innerHTML = cart.map(item => `
+    container.innerHTML = cart.map(item => {
+      const imageHTML = item.image
+        ? `<img src="${item.image}" alt="${item.name}">`
+        : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8ECAAE" stroke-width="1.5"><circle cx="12" cy="12" r="10"/></svg>';
+      return `
       <div class="order-item">
-        <div class="order-item-left">
-          <div class="order-item-name">${item.name}</div>
-          <div class="order-item-qty">Qty: ${item.qty}</div>
+        <div class="order-item-main">
+          <div class="order-item-img">${imageHTML}</div>
+          <div class="order-item-left">
+            <div class="order-item-name">${item.name}</div>
+            <div class="order-item-qty">Qty: ${item.qty}</div>
+            ${item.customization ? `<div class="order-item-qty">${item.customization.type || 'Custom'} · ${item.customization.artworkCount || 0} uploaded artwork file(s)</div>` : ''}
+          </div>
         </div>
         <div class="order-item-price">$${(item.price * item.qty).toFixed(2)}</div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
 
     totalEl.textContent = '$' + getTotal().toFixed(2);
     return true;
