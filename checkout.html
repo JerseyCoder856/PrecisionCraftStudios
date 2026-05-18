@@ -187,6 +187,51 @@
     };
   }
 
+  const notificationEmail = 'precisioncraftstudios@gmail.com';
+
+  function summarizeCustomization(customization) {
+    if (!customization) return 'None';
+    const clone = { ...customization };
+    if (Array.isArray(clone.uploadedAssets)) {
+      clone.uploadedAssetNames = clone.uploadedAssets.map(asset => asset.name || 'Uploaded artwork');
+      clone.uploadedAssetCount = clone.uploadedAssets.length;
+      delete clone.uploadedAssets;
+    }
+    if (clone.drawingDataUrl) {
+      clone.drawingIncluded = 'Yes';
+      delete clone.drawingDataUrl;
+    }
+    return JSON.stringify(clone, null, 2);
+  }
+
+  function sendOrderNotification(order) {
+    const fields = {
+      email: order.customer.email || '',
+      name: order.customer.name || '',
+      'Order ID': order.orderId,
+      'Customer Name': order.customer.name || 'Not provided',
+      'Customer Email': order.customer.email || 'Not provided',
+      'Customer Phone': order.customer.phone || 'Not provided',
+      'Shipping Address': order.customer.address || 'Not provided',
+      'Order Notes': order.customer.notes || 'None',
+      'Total': `$${order.total}`,
+      'PayPal Transaction ID': order.payment?.id || 'Not available',
+      'Items': order.cart.map(item => `${item.qty} × ${item.name} ($${(item.price * item.qty).toFixed(2)})`).join('\n'),
+      'Workspace / Customization Details': order.cart.map(item => `${item.name}:\n${summarizeCustomization(item.customization)}`).join('\n\n')
+    };
+
+    return fetch(`https://formsubmit.co/ajax/${notificationEmail}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject: `Paid Precision Craft Studios Order #${order.orderId}`,
+        _template: 'table',
+        _captcha: 'false',
+        ...fields
+      })
+    });
+  }
+
   function renderOrderSummary() {
     const container = document.getElementById('checkoutItems');
     const totalEl = document.getElementById('checkoutTotal');
@@ -248,7 +293,7 @@
       },
 
       onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
+        return actions.order.capture().then(async function(details) {
           const order = {
             orderId: Date.now(),
             customer: getCustomer(),
@@ -257,6 +302,11 @@
             payment: details
           };
           localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
+          try {
+            await sendOrderNotification(order);
+          } catch (error) {
+            console.error('Order email notification failed:', error);
+          }
           localStorage.removeItem('pcs_cart');
           window.location.href = 'success.html';
         });
