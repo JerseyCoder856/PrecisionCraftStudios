@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" role="img" aria-label="Red front trucker snapback template">
+  <defs>
+    <linearGradient id="front" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f0f2ed"/></linearGradient>
+    <linearGradient id="mesh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f8f8f4"/><stop offset="1" stop-color="#d94444" stop-opacity="0.55"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000" flood-opacity="0.18"/></filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <path d="M145 298 C165 140 280 72 450 72 C620 72 735 140 755 298 L710 332 C588 276 312 276 190 332 Z" fill="url(#mesh)" stroke="#2a2a2a" stroke-width="8" stroke-linejoin="round"/>
+    <path d="M304 93 C350 74 550 74 596 93 C631 155 641 232 621 314 C520 292 380 292 279 314 C259 232 269 155 304 93 Z" fill="url(#front)" stroke="#2a2a2a" stroke-width="7"/>
+    <path d="M450 78 L450 292" stroke="#d8ddd6" stroke-width="4" opacity="0.75"/>
+    <path d="M315 118 C250 168 219 236 202 322" stroke="#ffffff" stroke-width="4" opacity="0.3"/>
+    <path d="M585 118 C650 168 681 236 698 322" stroke="#ffffff" stroke-width="4" opacity="0.3"/>
+    <path d="M190 332 C310 284 590 284 710 332 C668 416 562 473 450 474 C338 473 232 416 190 332 Z" fill="#d94444" stroke="#2a2a2a" stroke-width="8" stroke-linejoin="round"/>
+    <path d="M249 356 C360 322 540 322 651 356" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="8" stroke-linecap="round"/>
+    <path d="M372 114 C405 101 495 101 528 114" fill="none" stroke="#d8ddd6" stroke-width="7" stroke-linecap="round"/>
+  </g>
+</svg>

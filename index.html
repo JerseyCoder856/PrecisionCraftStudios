@@ -520,6 +520,8 @@
   }
   .add-to-cart:hover { background: var(--mint-deep); }
   .add-to-cart.adding { background: var(--mint); }
+  .create-btn { background: var(--mint-deep); }
+  .create-btn:hover { background: var(--black); }
 
   /* ─── SLIDE-OUT CART ─── */
   .cart-overlay {
@@ -861,7 +863,25 @@
         <div class="product-desc">Hand-painted with a custom design. Structured fit, premium fabric.</div>
         <div class="product-footer">
           <div class="product-price">$20.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'Signature Snapback', 20.00)">Add</button>
+          <button class="add-to-cart" onclick="addToCart(this, 'CAMDEN Signature Snapback', 20.00, 'https://i.imgur.com/S7gn8BC.jpeg')">Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRODUCT 1.custom -->
+    <div class="product-card" data-category="hats">
+      <div class="product-image">
+        <img src="assets/hat-templates/white.svg" alt="Custom Signature Snapback's blank white-front trucker hat">
+        <span class="product-badge new">Custom</span>
+        <div class="product-image-overlay"></div>
+      </div>
+      <div class="product-info">
+        <div class="product-category">Hats</div>
+        <div class="product-name">Custom Signature Snapback's</div>
+        <div class="product-desc">Design your own white-front trucker snapback with artwork positioned on the front panel.</div>
+        <div class="product-footer">
+          <div class="product-price">$25.00</div>
+          <button class="add-to-cart create-btn" onclick="startCustomization('snapback-workspace.html')">Create</button>
         </div>
       </div>
     </div>
@@ -896,7 +916,7 @@
         <div class="product-desc">Set of 10+ custom die-cut stickers 4"x 7". Waterproof & UV-resistant vinyl.</div>
         <div class="product-footer">
           <div class="product-price">$5.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'Custom Sticker Pack', 5.00)">Add</button>
+          <button class="add-to-cart create-btn" onclick="startCustomization('sticker-workspace.html?product=custom-sticker-pack')">Create</button>
         </div>
       </div>
     </div>
@@ -913,7 +933,7 @@
         <div class="product-desc">Bold, custom die-cut 4"x 7" stickers for laptops, water bottles, and more.</div>
         <div class="product-footer">
           <div class="product-price">$5.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'Logo Sticker Pack', 5.00)">Add</button>
+          <button class="add-to-cart create-btn" onclick="startCustomization('sticker-workspace.html?product=logo-sticker-pack')">Create</button>
         </div>
       </div>
     </div>
@@ -947,7 +967,7 @@
         <div class="product-desc">Hand-painted with a custom design. Structured fit, premium fabric.</div>
         <div class="product-footer">
           <div class="product-price">$20.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'Signature Snapback', 20.00)">Add</button>
+          <button class="add-to-cart" onclick="addToCart(this, 'PUERTO RICO Signature Snapback', 20.00, 'https://i.imgur.com/XmdDdAC.jpeg')">Add</button>
         </div>
       </div>
     </div>
@@ -964,7 +984,7 @@
         <div class="product-desc">Hand-painted with a custom design. Structured fit, premium fabric.</div>
         <div class="product-footer">
           <div class="product-price">$20.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'Signature Snapback', 20.00)">Add</button>
+          <button class="add-to-cart" onclick="addToCart(this, 'CAMDEN Signature Snapback - Green Brim', 20.00, 'https://i.imgur.com/IRw2XyS.jpeg')">Add</button>
         </div>
       </div>
     </div>
@@ -981,7 +1001,7 @@
         <div class="product-desc">Hand-painted with a custom design. Structured fit, premium fabric.</div>
         <div class="product-footer">
           <div class="product-price">$20.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'Signature Snapback', 20.00)">Add</button>
+          <button class="add-to-cart" onclick="addToCart(this, 'PR (Puerto Rico) Signature Snapback', 20.00, 'https://i.imgur.com/uBWFn2d.jpeg')">Add</button>
         </div>
       </div>
     </div>
@@ -1138,6 +1158,14 @@
   // ─── CART STATE ───
   // Load cart from localStorage on page load
   let cart = JSON.parse(localStorage.getItem('pcs_cart')) || [];
+  const quantityEnabledProducts = ['Custom Sticker Pack', 'Logo Sticker Pack', "Custom Signature Snapback's"];
+
+  function productAllowsQuantity(name) {
+    return quantityEnabledProducts.includes(name);
+  }
+
+  cart = cart.map(item => productAllowsQuantity(item.name) || item.allowQuantity ? item : { ...item, qty: 1, allowQuantity: false });
+  saveCart();
 
   function saveCart() {
     localStorage.setItem('pcs_cart', JSON.stringify(cart));
@@ -1154,21 +1182,36 @@
     document.getElementById('cartDrawer').classList.remove('open');
   }
 
-  function addToCart(btn, name, price) {
+  function startCustomization(url) {
+    window.location.href = url;
+  }
+
+  function addToCart(btn, name, price, image = '') {
     const existing = cart.find(i => i.name === name);
     if (existing) {
-      existing.qty++;
+      if (productAllowsQuantity(name)) {
+        existing.qty++;
+      } else {
+        existing.qty = 1;
+        showToast(name + ' is one-of-a-kind and is limited to one per purchase.');
+        renderCart();
+        saveCart();
+        updateCartCount();
+        return;
+      }
     } else {
-      cart.push({ name, price, qty: 1 });
+      cart.push({ name, price, qty: 1, image, allowQuantity: productAllowsQuantity(name) });
     }
     saveCart();
 
-    btn.classList.add('adding');
-    btn.textContent = '✓ Added';
-    setTimeout(() => {
-      btn.classList.remove('adding');
-      btn.textContent = 'Add';
-    }, 1500);
+    if (btn) {
+      btn.classList.add('adding');
+      btn.textContent = '✓ Added';
+      setTimeout(() => {
+        btn.classList.remove('adding');
+        btn.textContent = 'Add';
+      }, 1500);
+    }
 
     updateCartCount();
     showToast(name + ' added to cart!');
@@ -1194,28 +1237,39 @@
     const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
     totalEl.textContent = '$' + total.toFixed(2);
 
-    el.innerHTML = cart.map((item, idx) => `
-      <div class="cart-item">
-        <div class="cart-item-img">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8ECAAE" stroke-width="1.5"><circle cx="12" cy="12" r="10"/></svg>
-        </div>
-        <div class="cart-item-info">
-          <div class="cart-item-name">${item.name}</div>
-          <div class="cart-item-price">$${item.price.toFixed(2)}</div>
-          <div class="cart-item-qty">
+    el.innerHTML = cart.map((item, idx) => {
+      const imageHTML = item.image
+        ? `<img src="${item.image}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;border-radius:3px;">`
+        : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8ECAAE" stroke-width="1.5"><circle cx="12" cy="12" r="10"/></svg>';
+      const qtyControls = productAllowsQuantity(item.name) || item.allowQuantity
+        ? `<div class="cart-item-qty">
             <button class="qty-btn" onclick="changeQty(${idx}, -1)">−</button>
             <span class="qty-val">${item.qty}</span>
             <button class="qty-btn" onclick="changeQty(${idx}, 1)">+</button>
-          </div>
+          </div>`
+        : '<div class="cart-item-qty"><span class="qty-val">Qty: 1</span></div>';
+      return `
+      <div class="cart-item">
+        <div class="cart-item-img">${imageHTML}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">$${item.price.toFixed(2)}</div>
+          ${qtyControls}
         </div>
         <button class="cart-item-remove" onclick="removeItem(${idx})">✕</button>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   }
 
   function changeQty(idx, delta) {
-    cart[idx].qty += delta;
-    if (cart[idx].qty <= 0) cart.splice(idx, 1);
+    if (!cart[idx]) return;
+    if (!productAllowsQuantity(cart[idx].name) && !cart[idx].allowQuantity) {
+      cart[idx].qty = 1;
+      showToast('This one-of-a-kind item is limited to one per purchase.');
+    } else {
+      cart[idx].qty += delta;
+    }
+    if (cart[idx] && cart[idx].qty <= 0) cart.splice(idx, 1);
     saveCart();
     updateCartCount();
     renderCart();
