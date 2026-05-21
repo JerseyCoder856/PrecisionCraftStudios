@@ -270,7 +270,7 @@ const subtotal = getSubtotal();
     const code = document.getElementById('couponInput').value.trim().toUpperCase();
     if (code === COUPON_CODE) {
       discountApplied = true;
-      setCouponMessage('Coupon applied. Order total is now free.', true);
+      setCouponMessage('Coupon applied. Order total is now free. JAYRAY can be used unlimited times.', true);
       renderOrderSummary();
       updatePaymentVisibility();
       return;
@@ -415,6 +415,9 @@ const subtotal = getSubtotal();
   const hasItems = renderOrderSummary();
   document.getElementById('applyCouponBtn').addEventListener('click', applyCoupon);
   document.getElementById('couponInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); } });
+  document.getElementById('couponInput').addEventListener('input', (e) => {
+    e.target.value = e.target.value.toUpperCase().replace(/\s+/g, '');
+  });
   document.getElementById('freeCheckoutBtn').addEventListener('click', submitFreeOrder);
 
   if (hasItems) {
