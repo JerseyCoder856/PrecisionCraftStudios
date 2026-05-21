@@ -63,6 +63,12 @@
   .order-item-left { display: flex; flex-direction: column; min-width: 0; }
   .order-item-name { font-size: 0.9rem; font-weight: 500; color: var(--black); }
   .order-item-qty { font-size: 0.78rem; color: var(--gray); margin-top: 2px; }
+  .order-item-controls { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .qty-btn { width: 24px; height: 24px; border: 1px solid var(--gray-light); background: var(--white); border-radius: 3px; cursor: pointer; font-size: .95rem; line-height: 1; display: flex; align-items: center; justify-content: center; }
+  .qty-btn:hover { border-color: var(--mint); color: var(--mint-deep); }
+  .qty-val { min-width: 18px; text-align: center; font-size: .8rem; color: var(--black-soft); }
+  .order-item-remove { border: none; background: none; color: var(--gray); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; padding: 0; }
+  .order-item-remove:hover { color: #e53e3e; }
   .order-item-price { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--black); }
   .order-divider { height: 1px; background: var(--gray-light); margin: 16px 0; }
   .order-total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
@@ -168,7 +174,7 @@
         <div class="coupon-msg" id="couponMsg"></div>
       </div>
 
-      <button type="button" id="freeCheckoutBtn" class="free-checkout-btn" style="display:none;">Place Free Order (JAYRAY)</button>
+      <button type="button" id="freeCheckoutBtn" class="free-checkout-btn" style="display:none;">Place Free Order (RAYJAY)</button>
       <div class="paypal-section">
         <div class="paypal-label">Complete your payment securely with PayPal</div>
         <div id="paypal-button-container"><div class="paypal-loading">Loading payment…</div></div>
@@ -185,7 +191,6 @@
 
 <!-- PayPal SDK — loaded LAST so DOM is ready -->
 <script src="https://www.paypal.com/sdk/js?client-id=AbXrEojdTjfYNt3CrJ4g-UyVEyW-WP5iH-FWpXcCx6Fl6Xoir3sW7Canw8JE_M2cXF5mBYbgmDbV4tva&currency=USD"></script>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
   // ─── Load cart from localStorage ───
   const quantityEnabledProducts = ['Custom Sticker Pack', 'Logo Sticker Pack', "Custom Signature Snapback's"];
@@ -195,7 +200,7 @@
   localStorage.setItem('pcs_cart', JSON.stringify(cart));
 
   const FORMSPREE_ENDPOINT = "https://formspree.io/f/xojbenoq";
-  const COUPON_CODE = "JAYRAY";
+  const COUPON_CODE = "RAYJAY";
   let discountApplied = false;
 
   function getSubtotal() {
@@ -230,10 +235,19 @@
       return false;
     }
 
-    container.innerHTML = cart.map(item => {
+    container.innerHTML = cart.map((item, idx) => {
       const imageHTML = item.image
         ? `<img src="${item.image}" alt="${item.name}">`
         : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8ECAAE" stroke-width="1.5"><circle cx="12" cy="12" r="10"/></svg>';
+      const canAdjustQty = quantityEnabledProducts.includes(item.name) || item.allowQuantity;
+      const qtyControls = canAdjustQty
+        ? `<div class="order-item-controls">
+            <button type="button" class="qty-btn" onclick="changeCheckoutQty(${idx}, -1)">−</button>
+            <span class="qty-val">${item.qty}</span>
+            <button type="button" class="qty-btn" onclick="changeCheckoutQty(${idx}, 1)">+</button>
+            <button type="button" class="order-item-remove" onclick="removeCheckoutItem(${idx})">Remove</button>
+          </div>`
+        : `<div class="order-item-controls"><button type="button" class="order-item-remove" onclick="removeCheckoutItem(${idx})">Remove</button></div>`;
       return `
       <div class="order-item">
         <div class="order-item-main">
@@ -242,6 +256,7 @@
             <div class="order-item-name">${item.name}</div>
             <div class="order-item-qty">Qty: ${item.qty}</div>
             ${item.customization ? `<div class="order-item-qty">${item.customization.type || 'Custom'} · ${item.customization.artworkCount || 0} uploaded artwork file(s)</div>` : ''}
+            ${qtyControls}
           </div>
         </div>
         <div class="order-item-price">$${(item.price * item.qty).toFixed(2)}</div>
@@ -251,8 +266,30 @@
 const subtotal = getSubtotal();
     const total = getTotal();
     totalEl.textContent = '$' + total.toFixed(2);
-    if (discountApplied) { totalEl.textContent += ' (JAYRAY applied)'; }
+    if (discountApplied) { totalEl.textContent += ` (${COUPON_CODE} applied)`; }
     return true;
+  }
+
+  function persistCheckoutCart() {
+    localStorage.setItem('pcs_cart', JSON.stringify(cart));
+  }
+
+  function changeCheckoutQty(idx, delta) {
+    if (!cart[idx]) return;
+    if (!(quantityEnabledProducts.includes(cart[idx].name) || cart[idx].allowQuantity)) return;
+    cart[idx].qty += delta;
+    if (cart[idx] && cart[idx].qty <= 0) {
+      cart.splice(idx, 1);
+    }
+    persistCheckoutCart();
+    renderOrderSummary();
+  }
+
+  function removeCheckoutItem(idx) {
+    if (!cart[idx]) return;
+    cart.splice(idx, 1);
+    persistCheckoutCart();
+    renderOrderSummary();
   }
 
   function setCouponMessage(message, ok = false) {
@@ -266,11 +303,45 @@ const subtotal = getSubtotal();
     document.getElementById('freeCheckoutBtn').style.display = discountApplied ? 'block' : 'none';
   }
 
+  async function postToFormspree(payload) {
+    const response = await fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (response.ok) return response;
+    let details = '';
+    try {
+      const data = await response.json();
+      if (data?.errors?.length) {
+        details = data.errors.map(err => err.message || err.code || 'Unknown validation error').join('; ');
+      }
+    } catch (_) {}
+    throw new Error(details || `Submission failed (${response.status})`);
+  }
+
+  async function submitOrderToFormspree({ couponCode = '', freeOrder = false, payment = null }) {
+    const customer = getCustomer();
+    const payload = {
+      cart: cart,
+      couponCode,
+      customer,
+      freeOrder,
+      subtotal: Number(getSubtotal().toFixed(2)),
+      total: Number(getTotal().toFixed(2)),
+      payment: payment || {}
+    };
+    await postToFormspree(payload);
+  }
+
   function applyCoupon() {
     const code = document.getElementById('couponInput').value.trim().toUpperCase();
     if (code === COUPON_CODE) {
       discountApplied = true;
-      setCouponMessage('Coupon applied. Order total is now free. JAYRAY can be used unlimited times.', true);
+      setCouponMessage(`Coupon applied. Order total is now free. ${COUPON_CODE} can be used unlimited times.`, true);
       renderOrderSummary();
       updatePaymentVisibility();
       return;
@@ -288,94 +359,9 @@ const subtotal = getSubtotal();
     const btn = document.getElementById('freeCheckoutBtn');
     btn.disabled = true;
     btn.textContent = 'Submitting…';
-    const compactCart = cart.map(item => ({
-      name: item.name,
-      qty: item.qty,
-      price: item.price,
-      customization: item.customization ? {
-        type: item.customization.type || 'Custom',
-        color: item.customization.color || '',
-        dimension: item.customization.dimension || '',
-        artworkCount: item.customization.artworkCount || 0,
-        uploadedAssets: (item.customization.uploadedAssets || []).map((asset, idx) => ({
-          name: asset.name || `asset-${idx + 1}`,
-          type: asset.type || 'image/*',
-          size: asset.size || 0,
-          shortRef: `asset_${idx + 1}`
-        })),
-        hasMockup: Boolean(item.customization.mockupDataUrl)
-      } : null
-    }));
-    const payload = {
-      couponCode: COUPON_CODE,
-      freeOrder: true,
-      customer,
-      cart: compactCart,
-      subtotal: getSubtotal().toFixed(2),
-      total: '0.00'
-    };
     try {
-      const formData = new FormData();
-      formData.append('couponCode', COUPON_CODE);
-      formData.append('freeOrder', 'true');
-      formData.append('customerName', customer.name || '');
-      formData.append('customerEmail', customer.email || '');
-      formData.append('customerPhone', customer.phone || '');
-      formData.append('customerAddress', customer.address || '');
-      formData.append('customerNotes', customer.notes || '');
-      formData.append('subtotal', payload.subtotal);
-      formData.append('total', payload.total);
-      formData.append('orderSummary', JSON.stringify(payload.cart));
-
-      if (typeof JSZip !== 'undefined') {
-        const zip = new JSZip();
-        cart.forEach((item, idx) => {
-          const safe = (item.name || 'item').replace(/[^a-z0-9-]/gi, '_');
-          const folder = zip.folder(`item-${idx + 1}-${safe}`);
-          const custom = item.customization || {};
-          (custom.uploadedAssets || []).forEach((asset, assetIdx) => {
-            if (asset.dataUrl && asset.dataUrl.includes(',')) {
-              folder.file(asset.name || `asset-${assetIdx + 1}.png`, asset.dataUrl.split(',')[1], { base64: true });
-            }
-          });
-          if (custom.mockupDataUrl && custom.mockupDataUrl.includes(',')) {
-            folder.file('mockup.png', custom.mockupDataUrl.split(',')[1], { base64: true });
-          }
-        });
-        const zipBlob = await zip.generateAsync({ type: 'blob' });
-        formData.append('attachment', zipBlob, `precisioncraft-order-${Date.now()}.zip`);
-        formData.append('files', zipBlob, `precisioncraft-order-${Date.now()}-files.zip`);
-      }
-
-      const postToFormspree = async (fd) => {
-        const response = await fetch(FORMSPREE_ENDPOINT, {
-          method: 'POST',
-          headers: { Accept: 'application/json' },
-          body: fd
-        });
-        if (response.ok) return response;
-        let details = '';
-        try {
-          const data = await response.json();
-          if (data?.errors?.length) {
-            details = data.errors.map(err => err.message || err.code || 'Unknown validation error').join('; ');
-          }
-        } catch (_) {}
-        throw new Error(details || `Submission failed (${response.status})`);
-      };
-
-      try {
-        await postToFormspree(formData);
-      } catch (uploadErr) {
-        console.warn('Formspree upload failed, retrying without attachment:', uploadErr);
-        const fallbackFormData = new FormData();
-        formData.forEach((value, key) => {
-          if (key !== 'attachment') fallbackFormData.append(key, value);
-        });
-        fallbackFormData.append('assetPackageStatus', 'ZIP upload was rejected. Use short references in orderSummary.uploadedAssets.shortRef to request files manually.');
-        await postToFormspree(fallbackFormData);
-      }
-      const order = { orderId: Date.now(), customer, cart, subtotal: payload.subtotal, total: '0.00', couponCode: COUPON_CODE, payment: { status: 'coupon-bypass' } };
+      await submitOrderToFormspree({ couponCode: COUPON_CODE, freeOrder: true, payment: { status: 'coupon-bypass' } });
+      const order = { orderId: Date.now(), customer, cart, subtotal: getSubtotal().toFixed(2), total: '0.00', couponCode: COUPON_CODE, payment: { status: 'coupon-bypass' } };
       localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
       localStorage.removeItem('pcs_cart');
       window.location.href = 'success.html';
@@ -384,7 +370,7 @@ const subtotal = getSubtotal();
       alert('Could not submit free order. Please try again.');
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Place Free Order (JAYRAY)';
+      btn.textContent = `Place Free Order (${COUPON_CODE})`;
     }
   }
 
@@ -413,7 +399,8 @@ const subtotal = getSubtotal();
       },
 
       onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
+        return actions.order.capture().then(async function(details) {
+          await submitOrderToFormspree({ couponCode: '', freeOrder: false, payment: details });
           const order = {
             orderId: Date.now(),
             customer: getCustomer(),
