@@ -303,11 +303,14 @@ const subtotal = getSubtotal();
     document.getElementById('freeCheckoutBtn').style.display = discountApplied ? 'block' : 'none';
   }
 
-  async function postToFormspree(fd) {
+  async function postToFormspree(payload) {
     const response = await fetch(FORMSPREE_ENDPOINT, {
       method: 'POST',
-      headers: { Accept: 'application/json' },
-      body: fd
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
     });
     if (response.ok) return response;
     let details = '';
@@ -322,87 +325,16 @@ const subtotal = getSubtotal();
 
   async function submitOrderToFormspree({ couponCode = '', freeOrder = false, payment = null }) {
     const customer = getCustomer();
-    const compactCart = cart.map(item => ({
-      name: item.name,
-      qty: item.qty,
-      price: item.price,
-      customization: item.customization ? {
-        type: item.customization.type || 'Custom',
-        color: item.customization.color || '',
-        dimension: item.customization.dimension || '',
-        artworkCount: item.customization.artworkCount || 0,
-        uploadedAssets: (item.customization.uploadedAssets || []).map((asset, idx) => ({
-          name: asset.name || `asset-${idx + 1}`,
-          type: asset.type || 'image/*',
-          size: asset.size || 0,
-          shortRef: `asset_${idx + 1}`
-        })),
-        hasMockup: Boolean(item.customization.mockupDataUrl)
-      } : null
-    }));
     const payload = {
+      cart: cart,
       couponCode,
-      freeOrder,
       customer,
-      cart: compactCart,
-      subtotal: getSubtotal().toFixed(2),
-      total: getTotal().toFixed(2),
-      payment
+      freeOrder,
+      subtotal: Number(getSubtotal().toFixed(2)),
+      total: Number(getTotal().toFixed(2)),
+      payment: payment || {}
     };
-
-    const buildAssetLinks = async () => {
-      const links = [];
-      for (let itemIdx = 0; itemIdx < cart.length; itemIdx++) {
-        const item = cart[itemIdx];
-        const custom = item.customization || {};
-        const entry = {
-          item: item.name || `Item ${itemIdx + 1}`,
-          qty: item.qty || 1,
-          productPreviewLink: item.image || '',
-          mockupLink: '',
-          drawingLink: '',
-          uploadedAssetLinks: []
-        };
-        if (custom.mockupDataUrl?.includes(',')) {
-          entry.mockupLink = custom.mockupDataUrl;
-        }
-        if (custom.drawingDataUrl?.includes(',')) {
-          entry.drawingLink = custom.drawingDataUrl;
-        }
-        if (Array.isArray(custom.uploadedAssets)) {
-          for (let assetIdx = 0; assetIdx < custom.uploadedAssets.length; assetIdx++) {
-            const asset = custom.uploadedAssets[assetIdx];
-            const linkObj = {
-              name: asset?.name || `asset-${assetIdx + 1}.png`,
-              link: ''
-            };
-            if (asset?.dataUrl?.includes(',')) {
-              linkObj.link = asset.dataUrl;
-            }
-            entry.uploadedAssetLinks.push(linkObj);
-          }
-        }
-        links.push(entry);
-      }
-      return links;
-    };
-
-    const formData = new FormData();
-    formData.append('couponCode', couponCode);
-    formData.append('freeOrder', String(freeOrder));
-    formData.append('customerName', customer.name || '');
-    formData.append('customerEmail', customer.email || '');
-    formData.append('customerPhone', customer.phone || '');
-    formData.append('customerAddress', customer.address || '');
-    formData.append('customerNotes', customer.notes || '');
-    formData.append('subtotal', payload.subtotal);
-    formData.append('total', payload.total);
-    formData.append('orderSummary', JSON.stringify(payload.cart));
-    formData.append('paymentSummary', JSON.stringify(payload.payment || {}));
-    const assetLinks = await buildAssetLinks();
-    formData.append('assetLinks', JSON.stringify(assetLinks));
-
-    await postToFormspree(formData);
+    await postToFormspree(payload);
   }
 
   function applyCoupon() {
