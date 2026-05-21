@@ -641,6 +641,9 @@
   .form-submit { width: 100%; background: var(--black); color: var(--white); border: none; padding: 16px; border-radius: 8px; font-family: var(--font-ui); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: background var(--transition), transform var(--transition), box-shadow var(--transition); margin-top: 6px; }
   .form-submit:hover { background: var(--mint-deep); transform: translateY(-1px); box-shadow: 0 12px 26px rgba(95,173,138,.25); }
   .form-success { display: none; background: var(--mint-pale); border: 1px solid var(--mint); border-radius: 8px; padding: 14px 20px; color: var(--mint-deep); font-size: 0.88rem; margin-top: 14px; text-align: center; font-weight: 500; }
+  .form-status { display: none; margin-top: 10px; font-size: 0.82rem; color: var(--gray); }
+  .form-note { margin-top: 12px; font-size: 0.8rem; color: var(--gray); line-height: 1.5; }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
   /* ─── FOOTER ─── */
   footer { background: var(--black); color: var(--white); padding: 60px 5% 30px; }
@@ -1074,6 +1077,18 @@
       <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" name="lastName" required placeholder="Your last name"></div>
     </div>
     <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" name="email" required placeholder="your@email.com"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Phone (optional)</label><input type="tel" class="form-input" name="phone" placeholder="(555) 555-5555"></div>
+      <div class="form-group">
+        <label class="form-label">Preferred Reply</label>
+        <select class="form-select" name="preferredReply" required>
+          <option value="">Choose one…</option>
+          <option>Email</option>
+          <option>Phone</option>
+          <option>Either</option>
+        </select>
+      </div>
+    </div>
     <div class="form-group">
       <label class="form-label">I'm interested in</label>
       <select class="form-select" name="interest" required>
@@ -1087,8 +1102,13 @@
     </div>
     <div class="form-group"><label class="form-label">Tell Us About Your Vision</label><textarea class="form-textarea" name="vision" required placeholder="Describe your idea, colors, design elements, or any details you have in mind…"></textarea></div>
     <div class="form-group"><label class="form-label">Attach Files (optional)</label><input type="file" class="form-input" name="attachment" accept="image/*,.pdf,.ai,.eps,.svg,.psd" multiple></div>
+    <input type="hidden" name="_subject" value="New Precision Craft Studios website inquiry">
+    <input type="hidden" name="_replyto" value="">
+    <input type="text" name="website" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true">
     <button class="form-submit" type="submit">Send Message →</button>
+    <div class="form-status" id="formStatus">Sending your message…</div>
     <div class="form-success" id="formSuccess">✓ Message received! We'll be in touch within 24 hours.</div>
+    <p class="form-note">Once this form is submitted, your message is delivered to <strong>precisioncraftstudios@gmail.com</strong>. Form replies will go to the email address you entered above.</p>
     </form>
   </div>
 </section>
@@ -1314,16 +1334,30 @@
     e.preventDefault();
     const form = e.currentTarget;
     const submitBtn = form.querySelector('.form-submit');
+    const successEl = document.getElementById('formSuccess');
+    const statusEl = document.getElementById('formStatus');
+    const emailField = form.querySelector('input[name="email"]');
+    const replyToField = form.querySelector('input[name="_replyto"]');
+    const honeypotField = form.querySelector('input[name="website"]');
+
+    if (honeypotField.value.trim()) return;
+
+    replyToField.value = emailField.value.trim();
+    successEl.style.display = 'none';
+    statusEl.style.display = 'block';
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending…';
+
     try {
       const formData = new FormData(form);
       const res = await fetch(form.action, { method: 'POST', body: formData, headers: { Accept: 'application/json' } });
       if (!res.ok) throw new Error('Form submit failed');
-      document.getElementById('formSuccess').style.display = 'block';
+      statusEl.style.display = 'none';
+      successEl.style.display = 'block';
       form.reset();
-      setTimeout(() => document.getElementById('formSuccess').style.display = 'none', 5000);
+      setTimeout(() => successEl.style.display = 'none', 5000);
     } catch (err) {
+      statusEl.style.display = 'none';
       showToast('Sorry, there was a problem sending your message. Please try again.');
     } finally {
       submitBtn.disabled = false;
