@@ -1063,19 +1063,20 @@
     </div>
   </div>
   <div class="contact-form">
+    <form id="contactForm" action="https://formspree.io/f/xojbenoq" method="POST" enctype="multipart/form-data">
     <div class="contact-form-header">
       <div class="contact-form-kicker">Custom Order Intake</div>
       <h3 class="contact-form-title">Tell us about your project</h3>
       <p class="contact-form-subtitle">Share the essentials below and we’ll follow up with next steps, pricing, and timing.</p>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" placeholder="Your first name"></div>
-      <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" placeholder="Your last name"></div>
+      <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" name="firstName" required placeholder="Your first name"></div>
+      <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" name="lastName" required placeholder="Your last name"></div>
     </div>
-    <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="your@email.com"></div>
+    <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" name="email" required placeholder="your@email.com"></div>
     <div class="form-group">
       <label class="form-label">I'm interested in</label>
-      <select class="form-select">
+      <select class="form-select" name="interest" required>
         <option value="">Select an option…</option>
         <option>Custom Painted Hat</option>
         <option>Custom Stickers</option>
@@ -1084,9 +1085,11 @@
         <option>Collaboration</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">Tell Us About Your Vision</label><textarea class="form-textarea" placeholder="Describe your idea, colors, design elements, or any details you have in mind…"></textarea></div>
-    <button class="form-submit" onclick="submitForm()">Send Message →</button>
+    <div class="form-group"><label class="form-label">Tell Us About Your Vision</label><textarea class="form-textarea" name="vision" required placeholder="Describe your idea, colors, design elements, or any details you have in mind…"></textarea></div>
+    <div class="form-group"><label class="form-label">Attach Files (optional)</label><input type="file" class="form-input" name="attachment" accept="image/*,.pdf,.ai,.eps,.svg,.psd" multiple></div>
+    <button class="form-submit" type="submit">Send Message →</button>
     <div class="form-success" id="formSuccess">✓ Message received! We'll be in touch within 24 hours.</div>
+    </form>
   </div>
 </section>
 
@@ -1307,10 +1310,25 @@
   }
 
   // ─── CONTACT FORM ───
-  function submitForm() {
-    document.getElementById('formSuccess').style.display = 'block';
-    setTimeout(() => document.getElementById('formSuccess').style.display = 'none', 4000);
-  }
+  document.getElementById('contactForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const submitBtn = form.querySelector('.form-submit');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    try {
+      const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error('Form submit failed');
+      document.getElementById('formSuccess').style.display = 'block';
+      form.reset();
+      setTimeout(() => document.getElementById('formSuccess').style.display = 'none', 5000);
+    } catch (err) {
+      showToast('Sorry, there was a problem sending your message. Please try again.');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send Message →';
+    }
+  });
 
   // ─── INIT ───
   window.addEventListener('load', () => {
