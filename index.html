@@ -1130,6 +1130,7 @@
 <!-- ─── TOAST ─── -->
 <div class="toast" id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
   // ─── NAVBAR SCROLL ───
   window.addEventListener('scroll', () => {
@@ -1310,6 +1311,27 @@
   }
 
   // ─── CONTACT FORM ───
+  async function buildOrderAssetsZip() {
+    if (typeof JSZip === 'undefined') return null;
+    const cart = JSON.parse(localStorage.getItem('pcs_cart') || '[]');
+    if (!cart.some(item => item?.customization?.uploadedAssets?.length || item?.customization?.mockupDataUrl)) return null;
+    const zip = new JSZip();
+    cart.forEach((item, idx) => {
+      const safe = (item.name || 'item').replace(/[^a-z0-9-]/gi, '_');
+      const folder = zip.folder(`item-${idx + 1}-${safe}`);
+      const custom = item.customization || {};
+      (custom.uploadedAssets || []).forEach((asset, assetIdx) => {
+        if (asset.dataUrl && asset.dataUrl.includes(',')) {
+          folder.file(asset.name || `asset-${assetIdx + 1}.png`, asset.dataUrl.split(',')[1], { base64: true });
+        }
+      });
+      if (custom.mockupDataUrl && custom.mockupDataUrl.includes(',')) {
+        folder.file('mockup.png', custom.mockupDataUrl.split(',')[1], { base64: true });
+      }
+    });
+    return zip.generateAsync({ type: 'blob' });
+  }
+
   document.getElementById('contactForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -1317,7 +1339,12 @@
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending…';
     try {
-      const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' } });
+      const formData = new FormData(form);
+      const zipBlob = await buildOrderAssetsZip();
+      if (zipBlob) {
+        formData.append('attachment', zipBlob, `precisioncraft-project-assets-${Date.now()}.zip`);
+      }
+      const res = await fetch(form.action, { method: 'POST', body: formData, headers: { Accept: 'application/json' } });
       if (!res.ok) throw new Error('Form submit failed');
       document.getElementById('formSuccess').style.display = 'block';
       form.reset();
