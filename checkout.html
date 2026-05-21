@@ -63,6 +63,12 @@
   .order-item-left { display: flex; flex-direction: column; min-width: 0; }
   .order-item-name { font-size: 0.9rem; font-weight: 500; color: var(--black); }
   .order-item-qty { font-size: 0.78rem; color: var(--gray); margin-top: 2px; }
+  .order-item-controls { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .qty-btn { width: 24px; height: 24px; border: 1px solid var(--gray-light); background: var(--white); border-radius: 3px; cursor: pointer; font-size: .95rem; line-height: 1; display: flex; align-items: center; justify-content: center; }
+  .qty-btn:hover { border-color: var(--mint); color: var(--mint-deep); }
+  .qty-val { min-width: 18px; text-align: center; font-size: .8rem; color: var(--black-soft); }
+  .order-item-remove { border: none; background: none; color: var(--gray); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; padding: 0; }
+  .order-item-remove:hover { color: #e53e3e; }
   .order-item-price { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--black); }
   .order-divider { height: 1px; background: var(--gray-light); margin: 16px 0; }
   .order-total-row { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
@@ -168,7 +174,7 @@
         <div class="coupon-msg" id="couponMsg"></div>
       </div>
 
-      <button type="button" id="freeCheckoutBtn" class="free-checkout-btn" style="display:none;">Place Free Order (JAYRAY)</button>
+      <button type="button" id="freeCheckoutBtn" class="free-checkout-btn" style="display:none;">Place Free Order (RAYJAY)</button>
       <div class="paypal-section">
         <div class="paypal-label">Complete your payment securely with PayPal</div>
         <div id="paypal-button-container"><div class="paypal-loading">Loading payment…</div></div>
@@ -195,7 +201,7 @@
   localStorage.setItem('pcs_cart', JSON.stringify(cart));
 
   const FORMSPREE_ENDPOINT = "https://formspree.io/f/xojbenoq";
-  const COUPON_CODE = "JAYRAY";
+  const COUPON_CODE = "RAYJAY";
   let discountApplied = false;
 
   function getSubtotal() {
@@ -230,10 +236,19 @@
       return false;
     }
 
-    container.innerHTML = cart.map(item => {
+    container.innerHTML = cart.map((item, idx) => {
       const imageHTML = item.image
         ? `<img src="${item.image}" alt="${item.name}">`
         : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8ECAAE" stroke-width="1.5"><circle cx="12" cy="12" r="10"/></svg>';
+      const canAdjustQty = quantityEnabledProducts.includes(item.name) || item.allowQuantity;
+      const qtyControls = canAdjustQty
+        ? `<div class="order-item-controls">
+            <button type="button" class="qty-btn" onclick="changeCheckoutQty(${idx}, -1)">−</button>
+            <span class="qty-val">${item.qty}</span>
+            <button type="button" class="qty-btn" onclick="changeCheckoutQty(${idx}, 1)">+</button>
+            <button type="button" class="order-item-remove" onclick="removeCheckoutItem(${idx})">Remove</button>
+          </div>`
+        : `<div class="order-item-controls"><button type="button" class="order-item-remove" onclick="removeCheckoutItem(${idx})">Remove</button></div>`;
       return `
       <div class="order-item">
         <div class="order-item-main">
@@ -242,6 +257,7 @@
             <div class="order-item-name">${item.name}</div>
             <div class="order-item-qty">Qty: ${item.qty}</div>
             ${item.customization ? `<div class="order-item-qty">${item.customization.type || 'Custom'} · ${item.customization.artworkCount || 0} uploaded artwork file(s)</div>` : ''}
+            ${qtyControls}
           </div>
         </div>
         <div class="order-item-price">$${(item.price * item.qty).toFixed(2)}</div>
@@ -251,8 +267,30 @@
 const subtotal = getSubtotal();
     const total = getTotal();
     totalEl.textContent = '$' + total.toFixed(2);
-    if (discountApplied) { totalEl.textContent += ' (JAYRAY applied)'; }
+    if (discountApplied) { totalEl.textContent += ` (${COUPON_CODE} applied)`; }
     return true;
+  }
+
+  function persistCheckoutCart() {
+    localStorage.setItem('pcs_cart', JSON.stringify(cart));
+  }
+
+  function changeCheckoutQty(idx, delta) {
+    if (!cart[idx]) return;
+    if (!(quantityEnabledProducts.includes(cart[idx].name) || cart[idx].allowQuantity)) return;
+    cart[idx].qty += delta;
+    if (cart[idx] && cart[idx].qty <= 0) {
+      cart.splice(idx, 1);
+    }
+    persistCheckoutCart();
+    renderOrderSummary();
+  }
+
+  function removeCheckoutItem(idx) {
+    if (!cart[idx]) return;
+    cart.splice(idx, 1);
+    persistCheckoutCart();
+    renderOrderSummary();
   }
 
   function setCouponMessage(message, ok = false) {
@@ -270,7 +308,7 @@ const subtotal = getSubtotal();
     const code = document.getElementById('couponInput').value.trim().toUpperCase();
     if (code === COUPON_CODE) {
       discountApplied = true;
-      setCouponMessage('Coupon applied. Order total is now free. JAYRAY can be used unlimited times.', true);
+      setCouponMessage(`Coupon applied. Order total is now free. ${COUPON_CODE} can be used unlimited times.`, true);
       renderOrderSummary();
       updatePaymentVisibility();
       return;
@@ -384,7 +422,7 @@ const subtotal = getSubtotal();
       alert('Could not submit free order. Please try again.');
     } finally {
       btn.disabled = false;
-      btn.textContent = 'Place Free Order (JAYRAY)';
+      btn.textContent = `Place Free Order (${COUPON_CODE})`;
     }
   }
 
