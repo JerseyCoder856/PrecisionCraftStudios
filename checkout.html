@@ -351,6 +351,65 @@ const subtotal = getSubtotal();
       payment
     };
 
+    const uploadDataUrlToShortLink = async (dataUrl, filename) => {
+      if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.includes(',')) return '';
+      const parts = dataUrl.split(',');
+      const mimeMatch = (parts[0] || '').match(/data:(.*?);base64/);
+      const mime = mimeMatch ? mimeMatch[1] : 'image/png';
+      const binary = atob(parts[1]);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const blob = new Blob([bytes], { type: mime });
+      const fd = new FormData();
+      fd.append('file', blob, filename || `pcs-${Date.now()}.png`);
+      const res = await fetch('https://0x0.st', { method: 'POST', body: fd });
+      if (!res.ok) throw new Error(`Short-link upload failed (${res.status})`);
+      return (await res.text()).trim();
+    };
+
+    const buildAssetLinks = async () => {
+      const links = [];
+      for (let itemIdx = 0; itemIdx < cart.length; itemIdx++) {
+        const item = cart[itemIdx];
+        const custom = item.customization || {};
+        const safeName = (item.name || 'item').replace(/[^a-z0-9-]/gi, '_').toLowerCase();
+        const entry = {
+          item: item.name || `Item ${itemIdx + 1}`,
+          qty: item.qty || 1,
+          mockupLink: '',
+          drawingLink: '',
+          uploadedAssetLinks: []
+        };
+        if (custom.mockupDataUrl?.includes(',')) {
+          try {
+            entry.mockupLink = await uploadDataUrlToShortLink(custom.mockupDataUrl, `${safeName}-mockup.png`);
+          } catch (_) {}
+        }
+        if (custom.drawingDataUrl?.includes(',')) {
+          try {
+            entry.drawingLink = await uploadDataUrlToShortLink(custom.drawingDataUrl, `${safeName}-drawing.png`);
+          } catch (_) {}
+        }
+        if (Array.isArray(custom.uploadedAssets)) {
+          for (let assetIdx = 0; assetIdx < custom.uploadedAssets.length; assetIdx++) {
+            const asset = custom.uploadedAssets[assetIdx];
+            const linkObj = {
+              name: asset?.name || `asset-${assetIdx + 1}.png`,
+              link: ''
+            };
+            if (asset?.dataUrl?.includes(',')) {
+              try {
+                linkObj.link = await uploadDataUrlToShortLink(asset.dataUrl, `${safeName}-asset-${assetIdx + 1}.png`);
+              } catch (_) {}
+            }
+            entry.uploadedAssetLinks.push(linkObj);
+          }
+        }
+        links.push(entry);
+      }
+      return links;
+    };
+
     const formData = new FormData();
     formData.append('couponCode', couponCode);
     formData.append('freeOrder', String(freeOrder));
@@ -363,38 +422,10 @@ const subtotal = getSubtotal();
     formData.append('total', payload.total);
     formData.append('orderSummary', JSON.stringify(payload.cart));
     formData.append('paymentSummary', JSON.stringify(payload.payment || {}));
+    const assetLinks = await buildAssetLinks();
+    formData.append('assetLinks', JSON.stringify(assetLinks));
 
-    if (typeof JSZip !== 'undefined') {
-      const zip = new JSZip();
-      cart.forEach((item, idx) => {
-        const safe = (item.name || 'item').replace(/[^a-z0-9-]/gi, '_');
-        const folder = zip.folder(`item-${idx + 1}-${safe}`);
-        const custom = item.customization || {};
-        (custom.uploadedAssets || []).forEach((asset, assetIdx) => {
-          if (asset.dataUrl && asset.dataUrl.includes(',')) {
-            folder.file(asset.name || `asset-${assetIdx + 1}.png`, asset.dataUrl.split(',')[1], { base64: true });
-          }
-        });
-        if (custom.mockupDataUrl && custom.mockupDataUrl.includes(',')) {
-          folder.file('mockup.png', custom.mockupDataUrl.split(',')[1], { base64: true });
-        }
-      });
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
-      formData.append('attachment', zipBlob, `precisioncraft-order-${Date.now()}.zip`);
-      formData.append('files', zipBlob, `precisioncraft-order-${Date.now()}-files.zip`);
-    }
-
-    try {
-      await postToFormspree(formData);
-    } catch (uploadErr) {
-      console.warn('Formspree upload failed, retrying without attachment:', uploadErr);
-      const fallbackFormData = new FormData();
-      formData.forEach((value, key) => {
-        if (key !== 'attachment' && key !== 'files') fallbackFormData.append(key, value);
-      });
-      fallbackFormData.append('assetPackageStatus', 'ZIP upload was rejected. Use short references in orderSummary.uploadedAssets.shortRef to request files manually.');
-      await postToFormspree(fallbackFormData);
-    }
+    await postToFormspree(formData);
   }
 
   function applyCoupon() {
