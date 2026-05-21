@@ -151,7 +151,8 @@
             <div class="order-item-name">${item.name}</div>
             <div class="order-item-qty">Qty: ${item.qty}</div>
             ${item.customization ? `<div class="order-item-qty">${item.customization.type || 'Custom'} · ${item.customization.artworkCount || 0} uploaded artwork file(s)</div>` : ''}
-            ${item.customization?.uploadedAssets?.length ? `<div class="order-item-qty">${item.customization.uploadedAssets.map((asset, assetIdx) => `<a href="${asset.dataUrl}" download="${asset.name || 'uploaded-artwork-' + (assetIdx + 1)}" style="color:#5FAD8A;text-decoration:none;margin-right:8px;">Download ${asset.name || 'Artwork ' + (assetIdx + 1)}</a>`).join('')}</div>` : ''}
+            ${item.customization?.uploadedAssets?.length ? `<div class="order-item-qty">${item.customization.uploadedAssets.length} source file(s) saved</div>` : ''}
+            ${item.customization?.mockupDataUrl ? `<div class="order-item-qty">Mockup snapshot saved</div>` : ''}
           </div>
         </div>
         <div class="order-item-price">$${(item.price * item.qty).toFixed(2)}</div>

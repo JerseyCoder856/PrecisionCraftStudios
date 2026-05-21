@@ -93,6 +93,15 @@
   /* ─── SECURE BADGE ─── */
   .secure-badge { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 20px; color: var(--gray); font-size: 0.75rem; letter-spacing: 0.06em; }
   .secure-badge svg { color: var(--mint-deep); }
+  .coupon-box { margin: 18px 0 10px; padding: 14px; border: 1px solid var(--gray-light); border-radius: 6px; background: #fcfefd; }
+  .coupon-title { font-size: 0.76rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; color: var(--black); margin-bottom: 10px; }
+  .coupon-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+  .coupon-btn { border: 1.5px solid var(--black); background: var(--black); color: #fff; padding: 0 16px; font-size: 0.76rem; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; border-radius: 3px; }
+  .coupon-msg { margin-top: 8px; font-size: .82rem; color: var(--gray); min-height: 18px; }
+  .coupon-msg.success { color: var(--mint-deep); font-weight: 500; }
+  .free-checkout-btn { width: 100%; margin-top: 12px; border: 2px solid var(--mint-deep); background: var(--mint-deep); color: #fff; padding: 12px 16px; border-radius: 3px; font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
+  .free-checkout-btn:hover { filter: brightness(.95); }
+  .free-checkout-btn:disabled { opacity: .6; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -149,6 +158,17 @@
         <span class="order-total-price" id="checkoutTotal">$0.00</span>
       </div>
 
+
+      <div class="coupon-box">
+        <div class="coupon-title">Have a discount code?</div>
+        <div class="coupon-row">
+          <input type="text" id="couponInput" class="form-input" placeholder="Enter code">
+          <button type="button" class="coupon-btn" id="applyCouponBtn">Apply</button>
+        </div>
+        <div class="coupon-msg" id="couponMsg"></div>
+      </div>
+
+      <button type="button" id="freeCheckoutBtn" class="free-checkout-btn" style="display:none;">Place Free Order (JAYRAY)</button>
       <div class="paypal-section">
         <div class="paypal-label">Complete your payment securely with PayPal</div>
         <div id="paypal-button-container"><div class="paypal-loading">Loading payment…</div></div>
@@ -165,6 +185,7 @@
 
 <!-- PayPal SDK — loaded LAST so DOM is ready -->
 <script src="https://www.paypal.com/sdk/js?client-id=AbXrEojdTjfYNt3CrJ4g-UyVEyW-WP5iH-FWpXcCx6Fl6Xoir3sW7Canw8JE_M2cXF5mBYbgmDbV4tva&currency=USD"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
   // ─── Load cart from localStorage ───
   const quantityEnabledProducts = ['Custom Sticker Pack', 'Logo Sticker Pack', "Custom Signature Snapback's"];
@@ -173,8 +194,16 @@
   );
   localStorage.setItem('pcs_cart', JSON.stringify(cart));
 
-  function getTotal() {
+  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xojbenoq";
+  const COUPON_CODE = "JAYRAY";
+  let discountApplied = false;
+
+  function getSubtotal() {
     return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  }
+
+  function getTotal() {
+    return discountApplied ? 0 : getSubtotal();
   }
 
   function getCustomer() {
@@ -219,8 +248,121 @@
       </div>`;
     }).join('');
 
-    totalEl.textContent = '$' + getTotal().toFixed(2);
+const subtotal = getSubtotal();
+    const total = getTotal();
+    totalEl.textContent = '$' + total.toFixed(2);
+    if (discountApplied) { totalEl.textContent += ' (JAYRAY applied)'; }
     return true;
+  }
+
+  function setCouponMessage(message, ok = false) {
+    const el = document.getElementById('couponMsg');
+    el.textContent = message;
+    el.classList.toggle('success', ok);
+  }
+
+  function updatePaymentVisibility() {
+    document.getElementById('paypal-button-container').style.display = discountApplied ? 'none' : 'block';
+    document.getElementById('freeCheckoutBtn').style.display = discountApplied ? 'block' : 'none';
+  }
+
+  function applyCoupon() {
+    const code = document.getElementById('couponInput').value.trim().toUpperCase();
+    if (code === COUPON_CODE) {
+      discountApplied = true;
+      setCouponMessage('Coupon applied. Order total is now free. JAYRAY can be used unlimited times.', true);
+      renderOrderSummary();
+      updatePaymentVisibility();
+      return;
+    }
+    discountApplied = false;
+    setCouponMessage('Invalid code.');
+    renderOrderSummary();
+    updatePaymentVisibility();
+  }
+
+  async function submitFreeOrder() {
+    if (!cart.length) { alert('Your cart is empty.'); return; }
+    const customer = getCustomer();
+    if (!customer.email) { alert('Please enter your email address.'); return; }
+    const btn = document.getElementById('freeCheckoutBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting…';
+    const compactCart = cart.map(item => ({
+      name: item.name,
+      qty: item.qty,
+      price: item.price,
+      customization: item.customization ? {
+        type: item.customization.type || 'Custom',
+        color: item.customization.color || '',
+        dimension: item.customization.dimension || '',
+        artworkCount: item.customization.artworkCount || 0,
+        uploadedAssets: (item.customization.uploadedAssets || []).map((asset, idx) => ({
+          name: asset.name || `asset-${idx + 1}`,
+          type: asset.type || 'image/*',
+          size: asset.size || 0,
+          shortRef: `asset_${idx + 1}`
+        })),
+        hasMockup: Boolean(item.customization.mockupDataUrl)
+      } : null
+    }));
+    const payload = {
+      couponCode: COUPON_CODE,
+      freeOrder: true,
+      customer,
+      cart: compactCart,
+      subtotal: getSubtotal().toFixed(2),
+      total: '0.00'
+    };
+    try {
+      const formData = new FormData();
+      formData.append('couponCode', COUPON_CODE);
+      formData.append('freeOrder', 'true');
+      formData.append('customerName', customer.name || '');
+      formData.append('customerEmail', customer.email || '');
+      formData.append('customerPhone', customer.phone || '');
+      formData.append('customerAddress', customer.address || '');
+      formData.append('customerNotes', customer.notes || '');
+      formData.append('subtotal', payload.subtotal);
+      formData.append('total', payload.total);
+      formData.append('orderSummary', JSON.stringify(payload.cart));
+
+      if (typeof JSZip !== 'undefined') {
+        const zip = new JSZip();
+        cart.forEach((item, idx) => {
+          const safe = (item.name || 'item').replace(/[^a-z0-9-]/gi, '_');
+          const folder = zip.folder(`item-${idx + 1}-${safe}`);
+          const custom = item.customization || {};
+          (custom.uploadedAssets || []).forEach((asset, assetIdx) => {
+            if (asset.dataUrl && asset.dataUrl.includes(',')) {
+              folder.file(asset.name || `asset-${assetIdx + 1}.png`, asset.dataUrl.split(',')[1], { base64: true });
+            }
+          });
+          if (custom.mockupDataUrl && custom.mockupDataUrl.includes(',')) {
+            folder.file('mockup.png', custom.mockupDataUrl.split(',')[1], { base64: true });
+          }
+        });
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        formData.append('attachment', zipBlob, `precisioncraft-order-${Date.now()}.zip`);
+      }
+
+      const res = await fetch(FORMSPREE_ENDPOINT, {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: formData
+      });
+      if (!res.ok) throw new Error('Submission failed');
+      const order = { orderId: Date.now(), customer, cart, subtotal: payload.subtotal, total: '0.00', couponCode: COUPON_CODE, payment: { status: 'coupon-bypass' } };
+      localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
+      localStorage.removeItem('pcs_cart');
+      window.location.href = 'success.html';
+    } catch (err) {
+      console.error(err);
+      alert('Could not submit free order. Please try again.');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Place Free Order (JAYRAY)';
+    }
   }
 
   function initPayPal() {
@@ -271,11 +413,19 @@
 
   // ─── INIT ───
   const hasItems = renderOrderSummary();
+  document.getElementById('applyCouponBtn').addEventListener('click', applyCoupon);
+  document.getElementById('couponInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); } });
+  document.getElementById('couponInput').addEventListener('input', (e) => {
+    e.target.value = e.target.value.toUpperCase().replace(/\s+/g, '');
+  });
+  document.getElementById('freeCheckoutBtn').addEventListener('click', submitFreeOrder);
+
   if (hasItems) {
     initPayPal();
   } else {
     document.getElementById('paypal-button-container').innerHTML = '';
   }
+  updatePaymentVisibility();
 </script>
 
 </body>
