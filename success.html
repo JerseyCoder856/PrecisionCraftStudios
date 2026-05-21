@@ -121,6 +121,7 @@
   <!-- Filled by JS below -->
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
   const order = (() => {
     try {
@@ -151,7 +152,8 @@
             <div class="order-item-name">${item.name}</div>
             <div class="order-item-qty">Qty: ${item.qty}</div>
             ${item.customization ? `<div class="order-item-qty">${item.customization.type || 'Custom'} · ${item.customization.artworkCount || 0} uploaded artwork file(s)</div>` : ''}
-            ${item.customization?.uploadedAssets?.length ? `<div class="order-item-qty">${item.customization.uploadedAssets.map((asset, assetIdx) => `<a href="${asset.dataUrl}" download="${asset.name || 'uploaded-artwork-' + (assetIdx + 1)}" style="color:#5FAD8A;text-decoration:none;margin-right:8px;">Download ${asset.name || 'Artwork ' + (assetIdx + 1)}</a>`).join('')}</div>` : ''}
+            ${item.customization?.uploadedAssets?.length ? `<div class="order-item-qty">${item.customization.uploadedAssets.length} source file(s) saved</div>` : ''}
+            ${item.customization?.mockupDataUrl ? `<div class="order-item-qty">Mockup snapshot saved</div>` : ''}
           </div>
         </div>
         <div class="order-item-price">$${(item.price * item.qty).toFixed(2)}</div>
@@ -200,10 +202,41 @@
       </div>
 
       <div class="cta-row">
+        <button id="downloadZipBtn" class="btn-secondary" type="button">Download Project Files (.zip)</button>
         <a href="index.html" class="btn-primary">Continue Shopping →</a>
         <a href="index.html#contact" class="btn-secondary">Contact Us</a>
       </div>
     `;
+
+    const downloadBtn = document.getElementById('downloadZipBtn');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', async () => {
+        if (typeof JSZip === 'undefined') {
+          alert('Zip generator unavailable right now.');
+          return;
+        }
+        const zip = new JSZip();
+        (order.cart || []).forEach((item, idx) => {
+          const safe = (item.name || 'item').replace(/[^a-z0-9-]/gi, '_');
+          const folder = zip.folder(`item-${idx + 1}-${safe}`);
+          const custom = item.customization || {};
+          (custom.uploadedAssets || []).forEach((asset, assetIdx) => {
+            if (asset.dataUrl && asset.dataUrl.includes(',')) {
+              folder.file(asset.name || `asset-${assetIdx + 1}.png`, asset.dataUrl.split(',')[1], { base64: true });
+            }
+          });
+          if (custom.mockupDataUrl && custom.mockupDataUrl.includes(',')) {
+            folder.file('mockup.png', custom.mockupDataUrl.split(',')[1], { base64: true });
+          }
+        });
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `precisioncraft-order-${order.orderId || Date.now()}.zip`;
+        link.click();
+        setTimeout(() => URL.revokeObjectURL(link.href), 1500);
+      });
+    }
   }
 </script>
 

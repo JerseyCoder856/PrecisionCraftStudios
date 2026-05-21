@@ -287,11 +287,29 @@ const subtotal = getSubtotal();
     const btn = document.getElementById('freeCheckoutBtn');
     btn.disabled = true;
     btn.textContent = 'Submitting…';
+    const compactCart = cart.map(item => ({
+      name: item.name,
+      qty: item.qty,
+      price: item.price,
+      customization: item.customization ? {
+        type: item.customization.type || 'Custom',
+        color: item.customization.color || '',
+        dimension: item.customization.dimension || '',
+        artworkCount: item.customization.artworkCount || 0,
+        uploadedAssets: (item.customization.uploadedAssets || []).map((asset, idx) => ({
+          name: asset.name || `asset-${idx + 1}`,
+          type: asset.type || 'image/*',
+          size: asset.size || 0,
+          shortRef: `asset_${idx + 1}`
+        })),
+        hasMockup: Boolean(item.customization.mockupDataUrl)
+      } : null
+    }));
     const payload = {
       couponCode: COUPON_CODE,
       freeOrder: true,
       customer,
-      cart,
+      cart: compactCart,
       subtotal: getSubtotal().toFixed(2),
       total: '0.00'
     };
