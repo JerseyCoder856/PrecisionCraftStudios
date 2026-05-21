@@ -185,6 +185,7 @@
 
 <!-- PayPal SDK — loaded LAST so DOM is ready -->
 <script src="https://www.paypal.com/sdk/js?client-id=AbXrEojdTjfYNt3CrJ4g-UyVEyW-WP5iH-FWpXcCx6Fl6Xoir3sW7Canw8JE_M2cXF5mBYbgmDbV4tva&currency=USD"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script>
   // ─── Load cart from localStorage ───
   const quantityEnabledProducts = ['Custom Sticker Pack', 'Logo Sticker Pack', "Custom Signature Snapback's"];
@@ -314,10 +315,41 @@ const subtotal = getSubtotal();
       total: '0.00'
     };
     try {
+      const formData = new FormData();
+      formData.append('couponCode', COUPON_CODE);
+      formData.append('freeOrder', 'true');
+      formData.append('customerName', customer.name || '');
+      formData.append('customerEmail', customer.email || '');
+      formData.append('customerPhone', customer.phone || '');
+      formData.append('customerAddress', customer.address || '');
+      formData.append('customerNotes', customer.notes || '');
+      formData.append('subtotal', payload.subtotal);
+      formData.append('total', payload.total);
+      formData.append('orderSummary', JSON.stringify(payload.cart));
+
+      if (typeof JSZip !== 'undefined') {
+        const zip = new JSZip();
+        cart.forEach((item, idx) => {
+          const safe = (item.name || 'item').replace(/[^a-z0-9-]/gi, '_');
+          const folder = zip.folder(`item-${idx + 1}-${safe}`);
+          const custom = item.customization || {};
+          (custom.uploadedAssets || []).forEach((asset, assetIdx) => {
+            if (asset.dataUrl && asset.dataUrl.includes(',')) {
+              folder.file(asset.name || `asset-${assetIdx + 1}.png`, asset.dataUrl.split(',')[1], { base64: true });
+            }
+          });
+          if (custom.mockupDataUrl && custom.mockupDataUrl.includes(',')) {
+            folder.file('mockup.png', custom.mockupDataUrl.split(',')[1], { base64: true });
+          }
+        });
+        const zipBlob = await zip.generateAsync({ type: 'blob' });
+        formData.append('attachment', zipBlob, `precisioncraft-order-${Date.now()}.zip`);
+      }
+
       const res = await fetch(FORMSPREE_ENDPOINT, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload)
+        headers: { Accept: 'application/json' },
+        body: formData
       });
       if (!res.ok) throw new Error('Submission failed');
       const order = { orderId: Date.now(), customer, cart, subtotal: payload.subtotal, total: '0.00', couponCode: COUPON_CODE, payment: { status: 'coupon-bypass' } };
