@@ -304,6 +304,99 @@ const subtotal = getSubtotal();
     document.getElementById('freeCheckoutBtn').style.display = discountApplied ? 'block' : 'none';
   }
 
+  async function postToFormspree(fd) {
+    const response = await fetch(FORMSPREE_ENDPOINT, {
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+      body: fd
+    });
+    if (response.ok) return response;
+    let details = '';
+    try {
+      const data = await response.json();
+      if (data?.errors?.length) {
+        details = data.errors.map(err => err.message || err.code || 'Unknown validation error').join('; ');
+      }
+    } catch (_) {}
+    throw new Error(details || `Submission failed (${response.status})`);
+  }
+
+  async function submitOrderToFormspree({ couponCode = '', freeOrder = false, payment = null }) {
+    const customer = getCustomer();
+    const compactCart = cart.map(item => ({
+      name: item.name,
+      qty: item.qty,
+      price: item.price,
+      customization: item.customization ? {
+        type: item.customization.type || 'Custom',
+        color: item.customization.color || '',
+        dimension: item.customization.dimension || '',
+        artworkCount: item.customization.artworkCount || 0,
+        uploadedAssets: (item.customization.uploadedAssets || []).map((asset, idx) => ({
+          name: asset.name || `asset-${idx + 1}`,
+          type: asset.type || 'image/*',
+          size: asset.size || 0,
+          shortRef: `asset_${idx + 1}`
+        })),
+        hasMockup: Boolean(item.customization.mockupDataUrl)
+      } : null
+    }));
+    const payload = {
+      couponCode,
+      freeOrder,
+      customer,
+      cart: compactCart,
+      subtotal: getSubtotal().toFixed(2),
+      total: getTotal().toFixed(2),
+      payment
+    };
+
+    const formData = new FormData();
+    formData.append('couponCode', couponCode);
+    formData.append('freeOrder', String(freeOrder));
+    formData.append('customerName', customer.name || '');
+    formData.append('customerEmail', customer.email || '');
+    formData.append('customerPhone', customer.phone || '');
+    formData.append('customerAddress', customer.address || '');
+    formData.append('customerNotes', customer.notes || '');
+    formData.append('subtotal', payload.subtotal);
+    formData.append('total', payload.total);
+    formData.append('orderSummary', JSON.stringify(payload.cart));
+    formData.append('paymentSummary', JSON.stringify(payload.payment || {}));
+
+    if (typeof JSZip !== 'undefined') {
+      const zip = new JSZip();
+      cart.forEach((item, idx) => {
+        const safe = (item.name || 'item').replace(/[^a-z0-9-]/gi, '_');
+        const folder = zip.folder(`item-${idx + 1}-${safe}`);
+        const custom = item.customization || {};
+        (custom.uploadedAssets || []).forEach((asset, assetIdx) => {
+          if (asset.dataUrl && asset.dataUrl.includes(',')) {
+            folder.file(asset.name || `asset-${assetIdx + 1}.png`, asset.dataUrl.split(',')[1], { base64: true });
+          }
+        });
+        if (custom.mockupDataUrl && custom.mockupDataUrl.includes(',')) {
+          folder.file('mockup.png', custom.mockupDataUrl.split(',')[1], { base64: true });
+        }
+      });
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      formData.append('attachment', zipBlob, `precisioncraft-order-${Date.now()}.zip`);
+      formData.append('files', zipBlob, `precisioncraft-order-${Date.now()}-files.zip`);
+    }
+
+    try {
+      await postToFormspree(formData);
+    } catch (uploadErr) {
+      console.warn('Formspree upload failed, retrying without attachment:', uploadErr);
+      const fallbackFormData = new FormData();
+      formData.forEach((value, key) => {
+        if (key !== 'attachment' && key !== 'files') fallbackFormData.append(key, value);
+      });
+      fallbackFormData.append('assetPackageStatus', 'ZIP upload was rejected. Use short references in orderSummary.uploadedAssets.shortRef to request files manually.');
+      await postToFormspree(fallbackFormData);
+    }
+  }
+
   function applyCoupon() {
     const code = document.getElementById('couponInput').value.trim().toUpperCase();
     if (code === COUPON_CODE) {
@@ -326,94 +419,9 @@ const subtotal = getSubtotal();
     const btn = document.getElementById('freeCheckoutBtn');
     btn.disabled = true;
     btn.textContent = 'Submitting…';
-    const compactCart = cart.map(item => ({
-      name: item.name,
-      qty: item.qty,
-      price: item.price,
-      customization: item.customization ? {
-        type: item.customization.type || 'Custom',
-        color: item.customization.color || '',
-        dimension: item.customization.dimension || '',
-        artworkCount: item.customization.artworkCount || 0,
-        uploadedAssets: (item.customization.uploadedAssets || []).map((asset, idx) => ({
-          name: asset.name || `asset-${idx + 1}`,
-          type: asset.type || 'image/*',
-          size: asset.size || 0,
-          shortRef: `asset_${idx + 1}`
-        })),
-        hasMockup: Boolean(item.customization.mockupDataUrl)
-      } : null
-    }));
-    const payload = {
-      couponCode: COUPON_CODE,
-      freeOrder: true,
-      customer,
-      cart: compactCart,
-      subtotal: getSubtotal().toFixed(2),
-      total: '0.00'
-    };
     try {
-      const formData = new FormData();
-      formData.append('couponCode', COUPON_CODE);
-      formData.append('freeOrder', 'true');
-      formData.append('customerName', customer.name || '');
-      formData.append('customerEmail', customer.email || '');
-      formData.append('customerPhone', customer.phone || '');
-      formData.append('customerAddress', customer.address || '');
-      formData.append('customerNotes', customer.notes || '');
-      formData.append('subtotal', payload.subtotal);
-      formData.append('total', payload.total);
-      formData.append('orderSummary', JSON.stringify(payload.cart));
-
-      if (typeof JSZip !== 'undefined') {
-        const zip = new JSZip();
-        cart.forEach((item, idx) => {
-          const safe = (item.name || 'item').replace(/[^a-z0-9-]/gi, '_');
-          const folder = zip.folder(`item-${idx + 1}-${safe}`);
-          const custom = item.customization || {};
-          (custom.uploadedAssets || []).forEach((asset, assetIdx) => {
-            if (asset.dataUrl && asset.dataUrl.includes(',')) {
-              folder.file(asset.name || `asset-${assetIdx + 1}.png`, asset.dataUrl.split(',')[1], { base64: true });
-            }
-          });
-          if (custom.mockupDataUrl && custom.mockupDataUrl.includes(',')) {
-            folder.file('mockup.png', custom.mockupDataUrl.split(',')[1], { base64: true });
-          }
-        });
-        const zipBlob = await zip.generateAsync({ type: 'blob' });
-        formData.append('attachment', zipBlob, `precisioncraft-order-${Date.now()}.zip`);
-        formData.append('files', zipBlob, `precisioncraft-order-${Date.now()}-files.zip`);
-      }
-
-      const postToFormspree = async (fd) => {
-        const response = await fetch(FORMSPREE_ENDPOINT, {
-          method: 'POST',
-          headers: { Accept: 'application/json' },
-          body: fd
-        });
-        if (response.ok) return response;
-        let details = '';
-        try {
-          const data = await response.json();
-          if (data?.errors?.length) {
-            details = data.errors.map(err => err.message || err.code || 'Unknown validation error').join('; ');
-          }
-        } catch (_) {}
-        throw new Error(details || `Submission failed (${response.status})`);
-      };
-
-      try {
-        await postToFormspree(formData);
-      } catch (uploadErr) {
-        console.warn('Formspree upload failed, retrying without attachment:', uploadErr);
-        const fallbackFormData = new FormData();
-        formData.forEach((value, key) => {
-          if (key !== 'attachment') fallbackFormData.append(key, value);
-        });
-        fallbackFormData.append('assetPackageStatus', 'ZIP upload was rejected. Use short references in orderSummary.uploadedAssets.shortRef to request files manually.');
-        await postToFormspree(fallbackFormData);
-      }
-      const order = { orderId: Date.now(), customer, cart, subtotal: payload.subtotal, total: '0.00', couponCode: COUPON_CODE, payment: { status: 'coupon-bypass' } };
+      await submitOrderToFormspree({ couponCode: COUPON_CODE, freeOrder: true, payment: { status: 'coupon-bypass' } });
+      const order = { orderId: Date.now(), customer, cart, subtotal: getSubtotal().toFixed(2), total: '0.00', couponCode: COUPON_CODE, payment: { status: 'coupon-bypass' } };
       localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
       localStorage.removeItem('pcs_cart');
       window.location.href = 'success.html';
@@ -451,7 +459,8 @@ const subtotal = getSubtotal();
       },
 
       onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
+        return actions.order.capture().then(async function(details) {
+          await submitOrderToFormspree({ couponCode: '', freeOrder: false, payment: details });
           const order = {
             orderId: Date.now(),
             customer: getCustomer(),
