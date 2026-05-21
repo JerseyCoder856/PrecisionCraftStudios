@@ -108,6 +108,22 @@
   .free-checkout-btn { width: 100%; margin-top: 12px; border: 2px solid var(--mint-deep); background: var(--mint-deep); color: #fff; padding: 12px 16px; border-radius: 3px; font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
   .free-checkout-btn:hover { filter: brightness(.95); }
   .free-checkout-btn:disabled { opacity: .6; cursor: not-allowed; }
+
+  @media (max-width: 700px) {
+    nav { height: auto; min-height: 72px; flex-wrap: wrap; gap: 10px 14px; padding: 10px 4%; align-items: center; }
+    .nav-logo { min-width: 0; flex: 1 1 220px; }
+    .nav-logo-img { width: 40px; height: 40px; }
+    .nav-brand { font-size: 0.95rem; }
+    .nav-brand span { font-size: 0.56rem; letter-spacing: 0.14em; }
+    .back-link { font-size: 0.7rem; letter-spacing: 0.08em; }
+    .checkout-page { margin: 24px auto; padding: 0 14px; gap: 16px; }
+    .panel { padding: 20px; }
+    .panel-title { font-size: 1.35rem; margin-bottom: 18px; }
+    .order-item { align-items: flex-start; }
+    .order-item-price { font-size: 1rem; }
+    .coupon-row { grid-template-columns: 1fr; }
+    .coupon-btn { min-height: 42px; }
+  }
 </style>
 </head>
 <body>
