@@ -344,14 +344,37 @@ const subtotal = getSubtotal();
         });
         const zipBlob = await zip.generateAsync({ type: 'blob' });
         formData.append('attachment', zipBlob, `precisioncraft-order-${Date.now()}.zip`);
+        formData.append('files', zipBlob, `precisioncraft-order-${Date.now()}-files.zip`);
       }
 
-      const res = await fetch(FORMSPREE_ENDPOINT, {
-        method: 'POST',
-        headers: { Accept: 'application/json' },
-        body: formData
-      });
-      if (!res.ok) throw new Error('Submission failed');
+      const postToFormspree = async (fd) => {
+        const response = await fetch(FORMSPREE_ENDPOINT, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: fd
+        });
+        if (response.ok) return response;
+        let details = '';
+        try {
+          const data = await response.json();
+          if (data?.errors?.length) {
+            details = data.errors.map(err => err.message || err.code || 'Unknown validation error').join('; ');
+          }
+        } catch (_) {}
+        throw new Error(details || `Submission failed (${response.status})`);
+      };
+
+      try {
+        await postToFormspree(formData);
+      } catch (uploadErr) {
+        console.warn('Formspree upload failed, retrying without attachment:', uploadErr);
+        const fallbackFormData = new FormData();
+        formData.forEach((value, key) => {
+          if (key !== 'attachment') fallbackFormData.append(key, value);
+        });
+        fallbackFormData.append('assetPackageStatus', 'ZIP upload was rejected. Use short references in orderSummary.uploadedAssets.shortRef to request files manually.');
+        await postToFormspree(fallbackFormData);
+      }
       const order = { orderId: Date.now(), customer, cart, subtotal: payload.subtotal, total: '0.00', couponCode: COUPON_CODE, payment: { status: 'coupon-bypass' } };
       localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
       localStorage.removeItem('pcs_cart');
