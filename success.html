@@ -82,6 +82,12 @@
 
   /* ─── CTA ─── */
   .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
+  @media print {
+    nav, .cta-row { display: none !important; }
+    body { background: #fff; }
+    .success-page { max-width: 100%; margin: 0; padding: 0; }
+    .order-card { box-shadow: none; border: 1px solid #ddd; }
+  }
   .btn-primary {
     display: inline-flex; align-items: center; gap: 8px;
     background: var(--black); color: var(--white);
@@ -131,6 +137,31 @@
   })();
 
   const page = document.getElementById('successPage');
+
+  function downloadReceipt(orderData) {
+    const safeItems = (orderData.cart || []).map(item => ({
+      name: item.name,
+      qty: item.qty,
+      lineTotal: Number(item.price * item.qty).toFixed(2)
+    }));
+    const receipt = {
+      orderId: orderData.orderId,
+      date: new Date(orderData.orderId).toISOString(),
+      customer: orderData.customer || {},
+      paymentId: orderData.payment?.id || '',
+      total: orderData.total || '0.00',
+      items: safeItems
+    };
+    const blob = new Blob([JSON.stringify(receipt, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pcs-receipt-${orderData.orderId}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
 
   if (!order) {
     page.innerHTML = `
@@ -201,10 +232,17 @@
       </div>
 
       <div class="cta-row">
+        <button type="button" class="btn-primary" id="printReceiptBtn">Print Receipt</button>
+        <button type="button" class="btn-secondary" id="downloadReceiptBtn">Download Receipt</button>
         <a href="index.html" class="btn-primary">Continue Shopping →</a>
         <a href="index.html#contact" class="btn-secondary">Contact Us</a>
       </div>
     `;
+
+    const printBtn = document.getElementById('printReceiptBtn');
+    const downloadBtn = document.getElementById('downloadReceiptBtn');
+    if (printBtn) printBtn.addEventListener('click', () => window.print());
+    if (downloadBtn) downloadBtn.addEventListener('click', () => downloadReceipt(order));
   }
 </script>
 
