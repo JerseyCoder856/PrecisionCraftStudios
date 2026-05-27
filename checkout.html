@@ -220,7 +220,7 @@
 </div>
 
 <!-- PayPal SDK — loaded LAST so DOM is ready -->
-<script src="https://www.paypal.com/sdk/js?client-id=Afkvlk0ouuGHnTWaNNWclJn68FXH2sTTrHdrgL0wSlszyii6X3eVVIMbX-qNm6wjH5RFN0TXndjSAybT&currency=USD"></script>
+
 <script>
   // ─── Load cart from localStorage ───
   const quantityEnabledProducts = ['Custom Sticker Pack', 'Logo Sticker Pack', "Custom Signature Snapback's"];
@@ -433,57 +433,77 @@ const subtotal = getSubtotal();
     }
   }
 
-  function initPayPal() {
+  async function fetchJSON(url, options = {}) {
+    const response = await fetch(url, options);
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const message = data?.error || data?.message || 'Request failed';
+      const detail = data?.details?.details?.[0]?.description || data?.details?.details?.[0]?.issue || '';
+      throw new Error(detail ? `${message}: ${detail}` : message);
+    }
+    return data;
+  }
+
+  async function loadPayPalSdk() {
+    const config = await fetchJSON('/api/paypal-config');
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(config.clientId)}&currency=${encodeURIComponent(config.currency)}&intent=${encodeURIComponent(config.intent)}`;
+    script.async = true;
+    await new Promise((resolve, reject) => {
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('Unable to load PayPal SDK.'));
+      document.head.appendChild(script);
+    });
+  }
+
+  async function initPayPal() {
+    try {
+      await loadPayPalSdk();
+    } catch (error) {
+      console.error(error);
+      document.getElementById('paypal-button-container').innerHTML = `<div class="paypal-loading">${error.message}</div>`;
+      return;
+    }
+
     if (typeof paypal === 'undefined') {
-      document.getElementById('paypal-button-container').innerHTML =
-        '<div class="paypal-loading">Payment unavailable — please refresh the page.</div>';
+      document.getElementById('paypal-button-container').innerHTML = '<div class="paypal-loading">Payment unavailable — please refresh the page.</div>';
       return;
     }
 
     paypal.Buttons({
       style: { layout: 'vertical', color: 'black', shape: 'rect', label: 'pay' },
-
-      createOrder: function(data, actions) {
+      createOrder: async function() {
         const total = getTotal();
-        if (total <= 0) {
-          alert('Your cart is empty. Please add items before checking out.');
-          return Promise.reject('Empty cart');
+        if (total <= 0) throw new Error('Your cart is empty. Please add items before checking out.');
+        const order = await fetchJSON('/api/create-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: total.toFixed(2), currency: 'USD' })
+        });
+        return order.id;
+      },
+      onApprove: async function(data) {
+        try {
+          const captureDetails = await fetchJSON('/api/capture-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderID: data.orderID })
+          });
+
+          await submitOrderToFormspree({ couponCode: '', freeOrder: false, payment: captureDetails });
+          const order = { orderId: Date.now(), customer: getCustomer(), cart: cart, total: getTotal().toFixed(2), payment: captureDetails };
+          localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
+          localStorage.removeItem('pcs_cart');
+          await showPaymentSharePopup(true, { shareText: `Thank you for your order from Precision Craft Studios. PayPal confirmation ${captureDetails.id || data.orderID}.` });
+          window.location.href = 'success.html';
+        } catch (error) {
+          console.error('Capture error:', error);
+          alert(`PayPal capture failed: ${error.message}`);
         }
-        return actions.order.create({
-          purchase_units: [{
-            amount: { value: total.toFixed(2) },
-            description: 'Precision Craft Studios Order'
-          }]
-        });
       },
-
-      onApprove: function(data, actions) {
-        return actions.order.capture().then(async function(details) {
-          try {
-            await submitOrderToFormspree({ couponCode: '', freeOrder: false, payment: details });
-            const order = {
-              orderId: Date.now(),
-              customer: getCustomer(),
-              cart: cart,
-              total: getTotal().toFixed(2),
-              payment: details
-            };
-            localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
-            localStorage.removeItem('pcs_cart');
-            await showPaymentSharePopup(true, {
-              shareText: `Thank you for your order from Precision Craft Studios. PayPal confirmation ${details.id || ''}.`
-            });
-            window.location.href = 'success.html';
-          } catch (err) {
-            console.error('Order submission error:', err);
-            await showPaymentSharePopup(false);
-          }
-        });
-      },
-
       onError: function(err) {
         console.error('PayPal error:', err);
-        showPaymentSharePopup(false);
+        alert(`PayPal error: ${err?.message || 'Unknown error'}`);
       }
     }).render('#paypal-button-container');
   }
