@@ -230,7 +230,8 @@
   localStorage.setItem('pcs_cart', JSON.stringify(cart));
 
   const FORMSPREE_ENDPOINT = "https://formspree.io/f/xlgvookl";
-  const COUPON_CODE = "MONEY";
+  const COUPON_CODE = "1DOLLAR";
+  const COUPON_EXPIRES_AT = new Date("2026-05-28T23:59:59Z");
   let discountApplied = false;
 
   function getSubtotal() {
@@ -238,7 +239,11 @@
   }
 
   function getTotal() {
-    return discountApplied ? 0 : getSubtotal();
+    return discountApplied ? 1 : getSubtotal();
+  }
+
+  function isCouponExpired() {
+    return new Date() > COUPON_EXPIRES_AT;
   }
 
   function getCustomer() {
@@ -331,8 +336,8 @@ const subtotal = getSubtotal();
   }
 
   function updatePaymentVisibility() {
-    document.getElementById('paypal-button-container').style.display = discountApplied ? 'none' : 'flex';
-    document.getElementById('freeCheckoutBtn').style.display = discountApplied ? 'block' : 'none';
+    document.getElementById('paypal-button-container').style.display = 'flex';
+    document.getElementById('freeCheckoutBtn').style.display = 'none';
   }
 
   async function postToFormspree(payload) {
@@ -371,15 +376,15 @@ const subtotal = getSubtotal();
 
   function applyCoupon() {
     const code = document.getElementById('couponInput').value.trim().toUpperCase();
-    if (code === COUPON_CODE) {
+    if (code === COUPON_CODE && !isCouponExpired()) {
       discountApplied = true;
-      setCouponMessage(`Coupon applied. Order total is now free. ${COUPON_CODE} can be used unlimited times.`, true);
+      setCouponMessage(`Coupon applied. Order total is now $1.00 through ${COUPON_EXPIRES_AT.toISOString().slice(0, 10)}.`, true);
       renderOrderSummary();
       updatePaymentVisibility();
       return;
     }
     discountApplied = false;
-    setCouponMessage('Invalid code.');
+    setCouponMessage(isCouponExpired() ? `This code expired on ${COUPON_EXPIRES_AT.toISOString().slice(0, 10)}.` : 'Invalid code.');
     renderOrderSummary();
     updatePaymentVisibility();
   }
@@ -495,7 +500,6 @@ const subtotal = getSubtotal();
   document.getElementById('couponInput').addEventListener('input', (e) => {
     e.target.value = e.target.value.toUpperCase().replace(/\s+/g, '');
   });
-  document.getElementById('freeCheckoutBtn').addEventListener('click', submitFreeOrder);
   document.getElementById('isGift').addEventListener('change', (e) => {
     document.getElementById('giftMessageWrap').style.display = e.target.checked ? 'block' : 'none';
   });
