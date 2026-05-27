@@ -99,6 +99,8 @@
   /* ─── SECURE BADGE ─── */
   .secure-badge { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 20px; color: var(--gray); font-size: 0.75rem; letter-spacing: 0.06em; }
   .secure-badge svg { color: var(--mint-deep); }
+  .gift-box { margin: 18px 0 10px; padding: 14px; border: 1px solid var(--gray-light); border-radius: 6px; background: #fcfefd; }
+  .gift-toggle { font-size:.86rem; color:var(--black-soft); display:flex; gap:8px; align-items:center; }
   .coupon-box { margin: 18px 0 10px; padding: 14px; border: 1px solid var(--gray-light); border-radius: 6px; background: #fcfefd; }
   .coupon-title { font-size: 0.76rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; color: var(--black); margin-bottom: 10px; }
   .coupon-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
@@ -137,10 +139,25 @@
 </nav>
 
 <div class="checkout-page">
+  <div class="panel checkout-main">
+    <div class="panel-title">Review <span>Your Items</span></div>
+    <div id="checkoutItems"><div class="paypal-loading">Loading your cart…</div></div>
+    <div class="order-divider"></div>
+    <div class="order-total-row">
+      <span class="order-total-label">Total</span>
+      <span class="order-total-price" id="checkoutTotal">$0.00</span>
+    </div>
 
-  <!-- LEFT: Customer Info -->
-  <div class="panel">
-    <div class="panel-title">Your <span>Details</span></div>
+    <div class="gift-box">
+      <div class="coupon-title">Gift options</div>
+      <label class="gift-toggle"><input type="checkbox" id="isGift"> This order is a gift</label>
+      <div id="giftMessageWrap" style="display:none; margin-top:10px;">
+        <label class="form-label">Gift Message</label>
+        <textarea id="giftMessage" class="form-textarea" placeholder="Write a short note for the recipient…" style="min-height:70px;"></textarea>
+      </div>
+    </div>
+
+    <div class="panel-title" style="margin-top:30px;">Shipping <span>& Contact</span></div>
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">First Name</label>
@@ -167,19 +184,8 @@
       <label class="form-label">Order Notes (optional)</label>
       <textarea id="notes" class="form-textarea" placeholder="Any special requests, custom design notes, or instructions…" style="min-height:70px;"></textarea>
     </div>
-  </div>
 
-  <!-- RIGHT: Order Summary + PayPal -->
-  <div>
-    <div class="panel">
-      <div class="panel-title">Order <span>Summary</span></div>
-      <div id="checkoutItems"><div class="paypal-loading">Loading your cart…</div></div>
-      <div class="order-divider"></div>
-      <div class="order-total-row">
-        <span class="order-total-label">Total</span>
-        <span class="order-total-price" id="checkoutTotal">$0.00</span>
-      </div>
-
+    <div class="panel-title" style="margin-top:12px;">Payment <span>Method</span></div>
 
       <div class="coupon-box">
         <div class="coupon-title">Have a discount code?</div>
@@ -200,9 +206,7 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
         Secured by PayPal
       </div>
-    </div>
   </div>
-
 </div>
 
 <!-- PayPal SDK — loaded LAST so DOM is ready -->
@@ -233,7 +237,9 @@
       email: document.getElementById('email').value.trim(),
       phone: document.getElementById('phone').value.trim(),
       address: document.getElementById('address').value.trim(),
-      notes: document.getElementById('notes').value.trim()
+      notes: document.getElementById('notes').value.trim(),
+      isGift: document.getElementById('isGift').checked,
+      giftMessage: document.getElementById('giftMessage').value.trim()
     };
   }
 
@@ -445,6 +451,9 @@ const subtotal = getSubtotal();
     e.target.value = e.target.value.toUpperCase().replace(/\s+/g, '');
   });
   document.getElementById('freeCheckoutBtn').addEventListener('click', submitFreeOrder);
+  document.getElementById('isGift').addEventListener('change', (e) => {
+    document.getElementById('giftMessageWrap').style.display = e.target.checked ? 'block' : 'none';
+  });
 
   if (hasItems) {
     initPayPal();
