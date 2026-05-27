@@ -389,30 +389,6 @@ const subtotal = getSubtotal();
     updatePaymentVisibility();
   }
 
-  async function showPaymentSharePopup(success, context = {}) {
-    const title = success ? 'Thanks for your order!' : 'Payment issue at Precision Craft Studios';
-    const message = success
-      ? 'Your payment was successful. Thank you for shopping with Precision Craft Studios.'
-      : 'There was an error processing your payment. Please retry checkout.';
-    const shareText = context.shareText || message;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title,
-          text: shareText,
-          url: window.location.origin + window.location.pathname
-        });
-      } catch (shareError) {
-        if (shareError?.name !== 'AbortError') {
-          console.warn('Share popup unavailable:', shareError);
-        }
-      }
-    }
-
-    alert(message);
-  }
-
   async function submitFreeOrder() {
     if (!cart.length) { alert('Your cart is empty.'); return; }
     const customer = getCustomer();
@@ -425,9 +401,6 @@ const subtotal = getSubtotal();
       const order = { orderId: Date.now(), customer, cart, subtotal: getSubtotal().toFixed(2), total: '0.00', couponCode: COUPON_CODE, payment: { status: 'coupon-bypass' } };
       localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
       localStorage.removeItem('pcs_cart');
-      await showPaymentSharePopup(true, {
-        shareText: `Thank you for your order from Precision Craft Studios. Order #${order.orderId}.`
-      });
       window.location.href = 'success.html';
     } catch (err) {
       console.error(err);
@@ -475,20 +448,17 @@ const subtotal = getSubtotal();
             };
             localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
             localStorage.removeItem('pcs_cart');
-            await showPaymentSharePopup(true, {
-              shareText: `Thank you for your order from Precision Craft Studios. PayPal confirmation ${details.id || ''}.`
-            });
             window.location.href = 'success.html';
           } catch (err) {
             console.error('Order submission error:', err);
-            await showPaymentSharePopup(false);
+            alert('We received your payment, but there was an issue finalizing the order details. Please contact us with your PayPal confirmation ID.');
           }
         });
       },
 
       onError: function(err) {
         console.error('PayPal error:', err);
-        showPaymentSharePopup(false);
+        alert('There was an error processing your payment. Please retry checkout.');
       }
     }).render('#paypal-button-container');
   }
