@@ -229,7 +229,7 @@
   );
   localStorage.setItem('pcs_cart', JSON.stringify(cart));
 
-  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xlgvookl";
+  const JOTFORM_ENDPOINT = "https://form.jotform.com/261458200956055";
   const COUPON_CODE = "MONEY";
   let discountApplied = false;
 
@@ -335,14 +335,13 @@ const subtotal = getSubtotal();
     document.getElementById('freeCheckoutBtn').style.display = discountApplied ? 'block' : 'none';
   }
 
-  async function postToFormspree(payload) {
-    const response = await fetch(FORMSPREE_ENDPOINT, {
+  async function postToJotform(payload) {
+    const response = await fetch(JOTFORM_ENDPOINT, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
+              },
+      body: buildJotformData(payload)
     });
     if (response.ok) return response;
     let details = '';
@@ -355,7 +354,26 @@ const subtotal = getSubtotal();
     throw new Error(details || `Submission failed (${response.status})`);
   }
 
-  async function submitOrderToFormspree({ couponCode = '', freeOrder = false, payment = null }) {
+  function buildJotformData(payload) {
+    const formData = new FormData();
+    formData.append('submissionType', 'Website Order');
+    formData.append('email', payload.customer?.email || '');
+    formData.append('name', payload.customer?.name || '');
+    formData.append('phone', payload.customer?.phone || '');
+    formData.append('address', payload.customer?.address || '');
+    formData.append('notes', payload.customer?.notes || '');
+    formData.append('isGift', payload.customer?.isGift ? 'Yes' : 'No');
+    formData.append('giftMessage', payload.customer?.giftMessage || '');
+    formData.append('couponCode', payload.couponCode || '');
+    formData.append('freeOrder', payload.freeOrder ? 'Yes' : 'No');
+    formData.append('subtotal', String(payload.subtotal ?? ''));
+    formData.append('total', String(payload.total ?? ''));
+    formData.append('cartSummary', JSON.stringify(payload.cart || []));
+    formData.append('paymentSummary', JSON.stringify(payload.payment || {}));
+    return formData;
+  }
+
+  async function submitOrderToJotform({ couponCode = '', freeOrder = false, payment = null }) {
     const customer = getCustomer();
     const payload = {
       cart: cart,
@@ -366,7 +384,7 @@ const subtotal = getSubtotal();
       total: Number(getTotal().toFixed(2)),
       payment: payment || {}
     };
-    await postToFormspree(payload);
+    await postToJotform(payload);
   }
 
   function applyCoupon() {
@@ -416,7 +434,7 @@ const subtotal = getSubtotal();
     btn.disabled = true;
     btn.textContent = 'Submitting…';
     try {
-      await submitOrderToFormspree({ couponCode: COUPON_CODE, freeOrder: true, payment: { status: 'coupon-bypass' } });
+      await submitOrderToJotform({ couponCode: COUPON_CODE, freeOrder: true, payment: { status: 'coupon-bypass' } });
       const order = { orderId: Date.now(), customer, cart, subtotal: getSubtotal().toFixed(2), total: '0.00', couponCode: COUPON_CODE, payment: { status: 'coupon-bypass' } };
       localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
       localStorage.removeItem('pcs_cart');
@@ -460,7 +478,7 @@ const subtotal = getSubtotal();
       onApprove: function(data, actions) {
         return actions.order.capture().then(async function(details) {
           try {
-            await submitOrderToFormspree({ couponCode: '', freeOrder: false, payment: details });
+            await submitOrderToJotform({ couponCode: '', freeOrder: false, payment: details });
             const order = {
               orderId: Date.now(),
               customer: getCustomer(),
