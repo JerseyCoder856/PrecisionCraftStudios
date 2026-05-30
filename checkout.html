@@ -206,7 +206,7 @@
         <div class="coupon-msg" id="couponMsg"></div>
       </div>
 
-      <button type="button" id="freeCheckoutBtn" class="free-checkout-btn" style="display:none;">Place Free Order (MONEY)</button>
+      <button type="button" id="freeCheckoutBtn" class="free-checkout-btn" style="display:none;">Place Free Order</button>
       <div class="paypal-section">
         <div class="paypal-label">Complete your payment securely with PayPal</div>
         <div id="paypal-button-container"><div class="paypal-loading">Loading payment…</div></div>
@@ -219,27 +219,17 @@
   </div>
 </div>
 
-<!-- PayPal SDK — loaded LAST so DOM is ready -->
-<script src="https://www.paypal.com/sdk/js?client-id=Afkvlk0ouuGHnTWaNNWclJn68FXH2sTTrHdrgL0wSlszyii6X3eVVIMbX-qNm6wjH5RFN0TXndjSAybT&currency=USD"></script>
 <script>
-  // ─── Load cart from localStorage ───
   const quantityEnabledProducts = ['Custom Sticker Pack', 'Logo Sticker Pack', "Custom Signature Snapback's"];
   const cart = (JSON.parse(localStorage.getItem('pcs_cart')) || []).map(item =>
     quantityEnabledProducts.includes(item.name) || item.allowQuantity ? item : { ...item, qty: 1, allowQuantity: false }
   );
   localStorage.setItem('pcs_cart', JSON.stringify(cart));
 
-  const FORMSPREE_ENDPOINT = "https://formspree.io/f/xlgvookl";
-  const COUPON_CODE = "MONEY";
   let discountApplied = false;
-
-  function getSubtotal() {
-    return cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  }
-
-  function getTotal() {
-    return discountApplied ? 0 : getSubtotal();
-  }
+  let checkoutConfig = { paypalClientId: '', currency: 'USD', freeOrderCouponEnabled: false };
+  let paypalButtonsRendered = false;
+  let activeOrder = null;
 
   function getCustomer() {
     return {
@@ -251,6 +241,22 @@
       isGift: document.getElementById('isGift').checked,
       giftMessage: document.getElementById('giftMessage').value.trim()
     };
+  }
+
+  function validateCustomer() {
+    const customer = getCustomer();
+    if (!customer.name) throw new Error('Please enter your first and last name.');
+    if (!customer.email || !customer.email.includes('@')) throw new Error('Please enter a valid email address.');
+    if (!customer.address || customer.address.length < 5) throw new Error('Please enter your shipping address.');
+    return customer;
+  }
+
+  function getSubtotal() {
+    return cart.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.qty || 1), 0);
+  }
+
+  function getTotal() {
+    return discountApplied ? 0 : getSubtotal();
   }
 
   function renderOrderSummary() {
@@ -295,24 +301,22 @@
       </div>`;
     }).join('');
 
-const subtotal = getSubtotal();
     const total = getTotal();
     totalEl.textContent = '$' + total.toFixed(2);
-    if (discountApplied) { totalEl.textContent += ` (${COUPON_CODE} applied)`; }
+    if (discountApplied) totalEl.textContent += ' (coupon applied)';
     return true;
   }
 
   function persistCheckoutCart() {
     localStorage.setItem('pcs_cart', JSON.stringify(cart));
+    activeOrder = null;
   }
 
   function changeCheckoutQty(idx, delta) {
     if (!cart[idx]) return;
     if (!(quantityEnabledProducts.includes(cart[idx].name) || cart[idx].allowQuantity)) return;
     cart[idx].qty += delta;
-    if (cart[idx] && cart[idx].qty <= 0) {
-      cart.splice(idx, 1);
-    }
+    if (cart[idx] && cart[idx].qty <= 0) cart.splice(idx, 1);
     persistCheckoutCart();
     renderOrderSummary();
   }
@@ -335,53 +339,39 @@ const subtotal = getSubtotal();
     document.getElementById('freeCheckoutBtn').style.display = discountApplied ? 'block' : 'none';
   }
 
-  async function postToFormspree(payload) {
-    const response = await fetch(FORMSPREE_ENDPOINT, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-    if (response.ok) return response;
-    let details = '';
-    try {
-      const data = await response.json();
-      if (data?.errors?.length) {
-        details = data.errors.map(err => err.message || err.code || 'Unknown validation error').join('; ');
-      }
-    } catch (_) {}
-    throw new Error(details || `Submission failed (${response.status})`);
-  }
-
-  async function submitOrderToFormspree({ couponCode = '', freeOrder = false, payment = null }) {
+  function buildIdempotencyKey() {
     const customer = getCustomer();
-    const payload = {
-      cart: cart,
-      couponCode,
-      customer,
-      freeOrder,
-      subtotal: Number(getSubtotal().toFixed(2)),
-      total: Number(getTotal().toFixed(2)),
-      payment: payment || {}
-    };
-    await postToFormspree(payload);
+    const raw = JSON.stringify({ cart, customer });
+    let hash = 0;
+    for (let i = 0; i < raw.length; i++) hash = Math.imul(31, hash) + raw.charCodeAt(i) | 0;
+    return `checkout-${Date.now()}-${Math.abs(hash)}`;
   }
 
-  function applyCoupon() {
-    const code = document.getElementById('couponInput').value.trim().toUpperCase();
-    if (code === COUPON_CODE) {
-      discountApplied = true;
-      setCouponMessage(`Coupon applied. Order total is now free. ${COUPON_CODE} can be used unlimited times.`, true);
-      renderOrderSummary();
-      updatePaymentVisibility();
-      return;
-    }
-    discountApplied = false;
-    setCouponMessage('Invalid code.');
-    renderOrderSummary();
-    updatePaymentVisibility();
+  async function apiFetch(url, options = {}) {
+    const response = await fetch(url, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...options.headers }
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
+    return data;
+  }
+
+  async function createServerOrder() {
+    const customer = validateCustomer();
+    if (!cart.length) throw new Error('Your cart is empty.');
+    const data = await apiFetch('/api/orders', {
+      method: 'POST',
+      body: JSON.stringify({ cart, customer, idempotencyKey: buildIdempotencyKey() })
+    });
+    activeOrder = data.order;
+    return data.order.paypalOrderId;
+  }
+
+  async function captureServerOrder(paypalOrderId) {
+    const data = await apiFetch(`/api/orders/${encodeURIComponent(paypalOrderId)}/capture`, { method: 'POST' });
+    activeOrder = data.order;
+    return data.order;
   }
 
   async function showPaymentSharePopup(success, context = {}) {
@@ -393,15 +383,9 @@ const subtotal = getSubtotal();
 
     if (navigator.share) {
       try {
-        await navigator.share({
-          title,
-          text: shareText,
-          url: window.location.origin + window.location.pathname
-        });
+        await navigator.share({ title, text: shareText, url: window.location.origin + window.location.pathname });
       } catch (shareError) {
-        if (shareError?.name !== 'AbortError') {
-          console.warn('Share popup unavailable:', shareError);
-        }
+        if (shareError?.name !== 'AbortError') console.warn('Share popup unavailable:', shareError);
       }
     }
 
@@ -409,102 +393,90 @@ const subtotal = getSubtotal();
   }
 
   async function submitFreeOrder() {
-    if (!cart.length) { alert('Your cart is empty.'); return; }
-    const customer = getCustomer();
-    if (!customer.email) { alert('Please enter your email address.'); return; }
-    const btn = document.getElementById('freeCheckoutBtn');
-    btn.disabled = true;
-    btn.textContent = 'Submitting…';
-    try {
-      await submitOrderToFormspree({ couponCode: COUPON_CODE, freeOrder: true, payment: { status: 'coupon-bypass' } });
-      const order = { orderId: Date.now(), customer, cart, subtotal: getSubtotal().toFixed(2), total: '0.00', couponCode: COUPON_CODE, payment: { status: 'coupon-bypass' } };
-      localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
-      localStorage.removeItem('pcs_cart');
-      await showPaymentSharePopup(true, {
-        shareText: `Thank you for your order from Precision Craft Studios. Order #${order.orderId}.`
-      });
-      window.location.href = 'success.html';
-    } catch (err) {
-      console.error(err);
-      alert('Could not submit free order. Please try again.');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = `Place Free Order (${COUPON_CODE})`;
-    }
+    alert('Free-order checkout is disabled. Please use PayPal to complete checkout.');
   }
 
-  function initPayPal() {
-    if (typeof paypal === 'undefined') {
-      document.getElementById('paypal-button-container').innerHTML =
-        '<div class="paypal-loading">Payment unavailable — please refresh the page.</div>';
-      return;
+  function applyCoupon() {
+    const code = document.getElementById('couponInput').value.trim().toUpperCase();
+    if (checkoutConfig.freeOrderCouponEnabled && code) {
+      discountApplied = true;
+      setCouponMessage('Coupon applied. This order will be submitted without PayPal.', true);
+    } else {
+      discountApplied = false;
+      setCouponMessage('Invalid or disabled code.');
     }
+    renderOrderSummary();
+    updatePaymentVisibility();
+  }
 
-    paypal.Buttons({
-      style: { layout: 'vertical', color: 'black', shape: 'rect', label: 'pay' },
+  async function loadPayPalSdk(clientId, currency) {
+    return new Promise((resolve, reject) => {
+      if (window.paypal) return resolve();
+      const script = document.createElement('script');
+      script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency)}&intent=capture&components=buttons`;
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('Unable to load the PayPal SDK.'));
+      document.head.appendChild(script);
+    });
+  }
 
-      createOrder: function(data, actions) {
-        const total = getTotal();
-        if (total <= 0) {
-          alert('Your cart is empty. Please add items before checking out.');
-          return Promise.reject('Empty cart');
-        }
-        return actions.order.create({
-          purchase_units: [{
-            amount: { value: total.toFixed(2) },
-            description: 'Precision Craft Studios Order'
-          }]
-        });
-      },
-
-      onApprove: function(data, actions) {
-        return actions.order.capture().then(async function(details) {
+  async function initPayPal() {
+    const container = document.getElementById('paypal-button-container');
+    if (paypalButtonsRendered || !cart.length) return;
+    try {
+      const config = await apiFetch('/api/config');
+      checkoutConfig = config;
+      if (!config.paypalClientId) throw new Error('PayPal is not configured on this server.');
+      await loadPayPalSdk(config.paypalClientId, config.currency || 'USD');
+      container.innerHTML = '';
+      window.paypal.Buttons({
+        style: { layout: 'vertical', color: 'black', shape: 'rect', label: 'pay' },
+        createOrder: async () => createServerOrder(),
+        onApprove: async (data) => {
           try {
-            await submitOrderToFormspree({ couponCode: '', freeOrder: false, payment: details });
-            const order = {
-              orderId: Date.now(),
-              customer: getCustomer(),
-              cart: cart,
-              total: getTotal().toFixed(2),
-              payment: details
-            };
-            localStorage.setItem('pcs_lastOrder', JSON.stringify(order));
+            const order = await captureServerOrder(data.orderID);
+            localStorage.setItem('pcs_lastOrder', JSON.stringify({
+              orderId: order.id,
+              customer: order.customer,
+              cart: order.items,
+              subtotal: order.subtotal,
+              total: order.total,
+              payment: { status: order.status, paypalOrderId: order.paypalOrderId }
+            }));
             localStorage.removeItem('pcs_cart');
-            await showPaymentSharePopup(true, {
-              shareText: `Thank you for your order from Precision Craft Studios. PayPal confirmation ${details.id || ''}.`
-            });
-            window.location.href = 'success.html';
+            await showPaymentSharePopup(true, { shareText: `Thank you for your order from Precision Craft Studios. Order ${order.id}.` });
+            window.location.href = `success.html?order=${encodeURIComponent(order.id)}`;
           } catch (err) {
-            console.error('Order submission error:', err);
+            console.error('Order capture error:', err);
             await showPaymentSharePopup(false);
           }
-        });
-      },
-
-      onError: function(err) {
-        console.error('PayPal error:', err);
-        showPaymentSharePopup(false);
-      }
-    }).render('#paypal-button-container');
+        },
+        onCancel: () => {
+          setCouponMessage('PayPal checkout was cancelled. You can retry when ready.');
+        },
+        onError: (err) => {
+          console.error('PayPal error:', err);
+          showPaymentSharePopup(false);
+        }
+      }).render('#paypal-button-container');
+      paypalButtonsRendered = true;
+    } catch (err) {
+      console.error(err);
+      container.innerHTML = `<div class="paypal-loading">${err.message}</div>`;
+    }
   }
 
-  // ─── INIT ───
   const hasItems = renderOrderSummary();
   document.getElementById('applyCouponBtn').addEventListener('click', applyCoupon);
   document.getElementById('couponInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); applyCoupon(); } });
-  document.getElementById('couponInput').addEventListener('input', (e) => {
-    e.target.value = e.target.value.toUpperCase().replace(/\s+/g, '');
-  });
+  document.getElementById('couponInput').addEventListener('input', (e) => { e.target.value = e.target.value.toUpperCase().replace(/\s+/g, ''); });
   document.getElementById('freeCheckoutBtn').addEventListener('click', submitFreeOrder);
   document.getElementById('isGift').addEventListener('change', (e) => {
     document.getElementById('giftMessageWrap').style.display = e.target.checked ? 'block' : 'none';
   });
 
-  if (hasItems) {
-    initPayPal();
-  } else {
-    document.getElementById('paypal-button-container').innerHTML = '';
-  }
+  if (hasItems) initPayPal();
+  else document.getElementById('paypal-button-container').innerHTML = '';
   updatePaymentVisibility();
 </script>
 

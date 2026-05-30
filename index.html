@@ -916,7 +916,7 @@
         <div class="product-desc">Hand-painted with a custom design. Structured fit, premium fabric.</div>
         <div class="product-footer">
           <div class="product-price">$20.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'CAMDEN Signature Snapback', 20.00, 'https://i.imgur.com/S7gn8BC.jpeg')">Add</button>
+          <button class="add-to-cart" onclick="addToCart(this, 'camden-signature-snapback-blue', 'CAMDEN Signature Snapback', 20.00, 'https://i.imgur.com/S7gn8BC.jpeg')">Add</button>
         </div>
       </div>
     </div>
@@ -1023,7 +1023,7 @@
         <div class="product-desc">Hand-painted with a custom design. Structured fit, premium fabric.</div>
         <div class="product-footer">
           <div class="product-price">$20.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'PUERTO RICO Signature Snapback', 20.00, 'https://i.imgur.com/XmdDdAC.jpeg')">Add</button>
+          <button class="add-to-cart" onclick="addToCart(this, 'puerto-rico-signature-snapback', 'PUERTO RICO Signature Snapback', 20.00, 'https://i.imgur.com/XmdDdAC.jpeg')">Add</button>
         </div>
       </div>
     </div>
@@ -1040,7 +1040,7 @@
         <div class="product-desc">Hand-painted with a custom design. Structured fit, premium fabric.</div>
         <div class="product-footer">
           <div class="product-price">$20.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'CAMDEN Signature Snapback - Green Brim', 20.00, 'https://i.imgur.com/IRw2XyS.jpeg')">Add</button>
+          <button class="add-to-cart" onclick="addToCart(this, 'camden-signature-snapback-green-brim', 'CAMDEN Signature Snapback - Green Brim', 20.00, 'https://i.imgur.com/IRw2XyS.jpeg')">Add</button>
         </div>
       </div>
     </div>
@@ -1057,7 +1057,7 @@
         <div class="product-desc">Hand-painted with a custom design. Structured fit, premium fabric.</div>
         <div class="product-footer">
           <div class="product-price">$20.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'PR (Puerto Rico) Signature Snapback', 20.00, 'https://i.imgur.com/uBWFn2d.jpeg')">Add</button>
+          <button class="add-to-cart" onclick="addToCart(this, 'pr-puerto-rico-signature-snapback', 'PR (Puerto Rico) Signature Snapback', 20.00, 'https://i.imgur.com/uBWFn2d.jpeg')">Add</button>
         </div>
       </div>
     </div>
@@ -1082,7 +1082,7 @@
 
     <div class="product-footer">
       <div class="product-price">$10.00</div>
-        <button class="add-to-cart" onclick="addToCart(this, 'Jesus Saves Signature Snapback', 10.00, 'IMG_9138.jpeg')">Add</button>
+        <button class="add-to-cart" onclick="addToCart(this, 'jesus-saves-signature-snapback', 'Jesus Saves Signature Snapback', 10.00, 'IMG_9138.jpeg')">Add</button>
     </div>
   </div>
 </div>
@@ -1103,7 +1103,7 @@
 
     <div class="product-footer">
       <div class="product-price">$20.00</div>
-        <button class="add-to-cart" onclick="addToCart(this, 'Camden Signature Snapback', 20.00, 'IMG_9145.jpeg')">Add</button>
+        <button class="add-to-cart" onclick="addToCart(this, 'camden-signature-snapback-brick', 'Camden Signature Snapback', 20.00, 'IMG_9145.jpeg')">Add</button>
     </div>
   </div>
 </div>
@@ -1124,7 +1124,7 @@
 
     <div class="product-footer">
       <div class="product-price">$20.00</div>
-        <button class="add-to-cart" onclick="addToCart(this, 'Puerto Rico Signature Snapback', 20.00, 'IMG_9143.jpeg')">Add</button>
+        <button class="add-to-cart" onclick="addToCart(this, 'puerto-rico-flag-signature-snapback', 'Puerto Rico Flag Signature Snapback', 20.00, 'IMG_9143.jpeg')">Add</button>
     </div>
   </div>
 </div>
@@ -1350,8 +1350,8 @@
     window.location.href = url;
   }
 
-  function addToCart(btn, name, price, image = '') {
-    const existing = cart.find(i => i.name === name);
+  function addToCart(btn, productId, name, price, image = '') {
+    const existing = cart.find(i => (i.productId || i.name) === productId);
     if (existing) {
       if (productAllowsQuantity(name)) {
         existing.qty++;
@@ -1364,7 +1364,7 @@
         return;
       }
     } else {
-      cart.push({ name, price, qty: 1, image, allowQuantity: productAllowsQuantity(name) });
+      cart.push({ productId, name, price, qty: 1, image, allowQuantity: productAllowsQuantity(name) });
     }
     saveCart();
 
