@@ -122,24 +122,46 @@
 </div>
 
 <script>
-  const order = (() => {
-    try {
-      return JSON.parse(localStorage.getItem('pcs_lastOrder'));
-    } catch(e) {
-      return null;
-    }
-  })();
-
   const page = document.getElementById('successPage');
 
-  if (!order) {
+  function localOrder() {
+    try { return JSON.parse(localStorage.getItem('pcs_lastOrder')); }
+    catch(e) { return null; }
+  }
+
+  async function fetchOrderFromServer(orderId) {
+    if (!orderId) return null;
+    const response = await fetch(`/api/orders/${encodeURIComponent(orderId)}`, { headers: { Accept: 'application/json' } });
+    if (!response.ok) return null;
+    const data = await response.json();
+    const order = data.order;
+    return {
+      orderId: order.id,
+      customer: order.customer,
+      cart: order.items.map(item => ({
+        ...item,
+        qty: item.quantity,
+        price: Number(item.unitAmount || 0)
+      })),
+      subtotal: order.subtotal,
+      total: order.total,
+      payment: { status: order.status, paypalOrderId: order.paypalOrderId },
+      completedAt: order.completedAt
+    };
+  }
+
+  function noOrder() {
     page.innerHTML = `
       <div class="no-order">
         <p>No order found. If you just placed an order, it was received!</p>
         <a href="index.html" class="btn-primary">Return to Shop</a>
       </div>`;
-  } else {
+  }
+
+  function renderOrder(order) {
     const itemsHTML = (order.cart || []).map(item => {
+      const qty = item.qty || item.quantity || 1;
+      const unitPrice = Number(item.price || item.unitAmount || 0);
       const imageHTML = item.image
         ? `<img src="${item.image}" alt="${item.name}">`
         : '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8ECAAE" stroke-width="1.5"><circle cx="12" cy="12" r="10"/></svg>';
@@ -149,23 +171,20 @@
           <div class="order-item-img">${imageHTML}</div>
           <div>
             <div class="order-item-name">${item.name}</div>
-            <div class="order-item-qty">Qty: ${item.qty}</div>
+            <div class="order-item-qty">Qty: ${qty}</div>
             ${item.customization ? `<div class="order-item-qty">${item.customization.type || 'Custom'} · ${item.customization.artworkCount || 0} uploaded artwork file(s)</div>` : ''}
             ${item.customization?.uploadedAssets?.length ? `<div class="order-item-qty">${item.customization.uploadedAssets.length} source file(s) saved</div>` : ''}
             ${item.customization?.mockupDataUrl ? `<div class="order-item-qty">Mockup snapshot saved</div>` : ''}
           </div>
         </div>
-        <div class="order-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+        <div class="order-item-price">$${(unitPrice * qty).toFixed(2)}</div>
       </div>`;
     }).join('');
 
-    const payerName = order.payment?.payer?.name
-      ? `${order.payment.payer.name.given_name} ${order.payment.payer.name.surname}`
-      : order.customer?.name || '—';
-
-    const payerEmail = order.payment?.payer?.email_address || order.customer?.email || '—';
-    const paypalId = order.payment?.id || '—';
-    const orderDate = new Date(order.orderId).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const payerName = order.customer?.name || '—';
+    const payerEmail = order.customer?.email || '—';
+    const paypalId = order.payment?.paypalOrderId || order.payment?.id || '—';
+    const orderDate = order.completedAt ? new Date(order.completedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
     page.innerHTML = `
       <div class="check-wrap">
@@ -187,7 +206,7 @@
           <div class="meta-item"><div class="meta-label">Name</div><div class="meta-value">${payerName}</div></div>
           <div class="meta-item"><div class="meta-label">Email</div><div class="meta-value">${payerEmail}</div></div>
           ${order.customer?.address ? `<div class="meta-item" style="grid-column:span 2"><div class="meta-label">Ship To</div><div class="meta-value">${order.customer.address}</div></div>` : ''}
-          <div class="meta-item"><div class="meta-label">PayPal ID</div><div class="meta-value" style="font-size:0.78rem;word-break:break-all;">${paypalId}</div></div>
+          <div class="meta-item"><div class="meta-label">PayPal Order ID</div><div class="meta-value" style="font-size:0.78rem;word-break:break-all;">${paypalId}</div></div>
         </div>
 
         <div class="order-divider"></div>
@@ -206,6 +225,14 @@
       </div>
     `;
   }
+
+  (async function initSuccessPage() {
+    const params = new URLSearchParams(window.location.search);
+    const serverOrder = await fetchOrderFromServer(params.get('order'));
+    const order = serverOrder || localOrder();
+    if (!order) noOrder();
+    else renderOrder(order);
+  })();
 </script>
 
 </body>
