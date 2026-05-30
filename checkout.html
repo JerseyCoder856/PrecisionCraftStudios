@@ -96,6 +96,8 @@
   #paypal-button-container {
     min-height: 50px;
     display: flex;
+    flex-direction: column;
+    gap: 10px;
     justify-content: center;
     align-items: center;
   }
@@ -227,7 +229,13 @@
   localStorage.setItem('pcs_cart', JSON.stringify(cart));
 
   let discountApplied = false;
-  let checkoutConfig = { paypalClientId: '', currency: 'USD', freeOrderCouponEnabled: false };
+  let checkoutConfig = {
+    paypalClientId: '',
+    currency: 'USD',
+    paypalEnabledFunding: ['paypal', 'paylater', 'venmo', 'card'],
+    paypalDisabledFunding: [],
+    freeOrderCouponEnabled: false
+  };
   let paypalButtonsRendered = false;
   let activeOrder = null;
 
@@ -409,11 +417,97 @@
     updatePaymentVisibility();
   }
 
-  async function loadPayPalSdk(clientId, currency) {
+  function normalizeFundingList(values) {
+    return Array.isArray(values) ? values.map(value => String(value).trim().toLowerCase()).filter(Boolean) : [];
+  }
+
+  function sdkFundingParams(config) {
+    const params = new URLSearchParams({
+      'client-id': config.paypalClientId,
+      currency: config.currency || 'USD',
+      intent: 'capture',
+      components: 'buttons,funding-eligibility'
+    });
+    const enabledFunding = normalizeFundingList(config.paypalEnabledFunding);
+    const disabledFunding = normalizeFundingList(config.paypalDisabledFunding);
+    const sdkEnabledFunding = enabledFunding.filter(name => !['paypal', 'card'].includes(name));
+    if (sdkEnabledFunding.length) params.set('enable-funding', sdkEnabledFunding.join(','));
+    if (disabledFunding.length) params.set('disable-funding', disabledFunding.join(','));
+    return params.toString();
+  }
+
+  function fundingSourceFromName(name) {
+    const key = String(name || '').trim().toUpperCase().replace(/-/g, '_');
+    const funding = window.paypal?.FUNDING || {};
+    return funding[key] || String(name || '').trim().toLowerCase();
+  }
+
+  function buttonOptions(fundingSource) {
+    const options = {
+      style: { layout: 'vertical', color: 'black', shape: 'rect', label: 'pay' },
+      createOrder: async () => createServerOrder(),
+      onApprove: async (data) => {
+        try {
+          const order = await captureServerOrder(data.orderID);
+          localStorage.setItem('pcs_lastOrder', JSON.stringify({
+            orderId: order.id,
+            customer: order.customer,
+            cart: order.items,
+            subtotal: order.subtotal,
+            total: order.total,
+            payment: { status: order.status, paypalOrderId: order.paypalOrderId }
+          }));
+          localStorage.removeItem('pcs_cart');
+          await showPaymentSharePopup(true, { shareText: `Thank you for your order from Precision Craft Studios. Order ${order.id}.` });
+          window.location.href = `success.html?order=${encodeURIComponent(order.id)}`;
+        } catch (err) {
+          console.error('Order capture error:', err);
+          await showPaymentSharePopup(false);
+        }
+      },
+      onCancel: () => {
+        setCouponMessage('PayPal checkout was cancelled. You can retry when ready.');
+      },
+      onError: (err) => {
+        console.error('PayPal error:', err);
+        showPaymentSharePopup(false);
+      }
+    };
+    if (fundingSource) options.fundingSource = fundingSource;
+    return options;
+  }
+
+  function renderStandalonePayPalButtons(container, config) {
+    const fundingNames = normalizeFundingList(config.paypalEnabledFunding);
+    let renderedCount = 0;
+    container.innerHTML = '';
+
+    fundingNames.forEach((fundingName) => {
+      const fundingSource = fundingSourceFromName(fundingName);
+      try {
+        const buttons = window.paypal.Buttons(buttonOptions(fundingSource));
+        if (!buttons.isEligible()) return;
+        const slot = document.createElement('div');
+        slot.className = 'paypal-button-slot';
+        slot.dataset.fundingSource = fundingName;
+        container.appendChild(slot);
+        buttons.render(slot);
+        renderedCount += 1;
+      } catch (err) {
+        console.warn(`Skipping unavailable PayPal funding source: ${fundingName}`, err);
+      }
+    });
+
+    if (renderedCount === 0) {
+      window.paypal.Buttons(buttonOptions()).render(container);
+    }
+  }
+
+  async function loadPayPalSdk(config) {
     return new Promise((resolve, reject) => {
       if (window.paypal) return resolve();
       const script = document.createElement('script');
-      script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency)}&intent=capture&components=buttons`;
+      script.src = `https://www.paypal.com/sdk/js?${sdkFundingParams(config)}`;
       script.onload = resolve;
       script.onerror = () => reject(new Error('Unable to load the PayPal SDK.'));
       document.head.appendChild(script);
@@ -427,38 +521,8 @@
       const config = await apiFetch('/api/config');
       checkoutConfig = config;
       if (!config.paypalClientId) throw new Error('PayPal is not configured on this server.');
-      await loadPayPalSdk(config.paypalClientId, config.currency || 'USD');
-      container.innerHTML = '';
-      window.paypal.Buttons({
-        style: { layout: 'vertical', color: 'black', shape: 'rect', label: 'pay' },
-        createOrder: async () => createServerOrder(),
-        onApprove: async (data) => {
-          try {
-            const order = await captureServerOrder(data.orderID);
-            localStorage.setItem('pcs_lastOrder', JSON.stringify({
-              orderId: order.id,
-              customer: order.customer,
-              cart: order.items,
-              subtotal: order.subtotal,
-              total: order.total,
-              payment: { status: order.status, paypalOrderId: order.paypalOrderId }
-            }));
-            localStorage.removeItem('pcs_cart');
-            await showPaymentSharePopup(true, { shareText: `Thank you for your order from Precision Craft Studios. Order ${order.id}.` });
-            window.location.href = `success.html?order=${encodeURIComponent(order.id)}`;
-          } catch (err) {
-            console.error('Order capture error:', err);
-            await showPaymentSharePopup(false);
-          }
-        },
-        onCancel: () => {
-          setCouponMessage('PayPal checkout was cancelled. You can retry when ready.');
-        },
-        onError: (err) => {
-          console.error('PayPal error:', err);
-          showPaymentSharePopup(false);
-        }
-      }).render('#paypal-button-container');
+      await loadPayPalSdk(config);
+      renderStandalonePayPalButtons(container, config);
       paypalButtonsRendered = true;
     } catch (err) {
       console.error(err);

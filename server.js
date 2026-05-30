@@ -54,7 +54,14 @@ async function routeApi(req, res, url) {
   const next = err => { if (err) handleError(err, res); };
 
   if (req.method === 'GET' && url.pathname === '/api/config') {
-    return sendJson(res, 200, { paypalClientId: config.paypal.clientId, paypalEnvironment: config.paypal.environment, currency: 'USD', freeOrderCouponEnabled: false });
+    return sendJson(res, 200, {
+      paypalClientId: config.paypal.clientId,
+      paypalEnvironment: config.paypal.environment,
+      currency: 'USD',
+      paypalEnabledFunding: config.paypal.enabledFunding,
+      paypalDisabledFunding: config.paypal.disabledFunding,
+      freeOrderCouponEnabled: false
+    });
   }
   if (req.method === 'POST' && url.pathname === '/api/orders') {
     return handleCreateOrder(req, adapt(req, res), next, config);

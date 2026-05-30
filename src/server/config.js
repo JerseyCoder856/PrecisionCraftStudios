@@ -25,6 +25,14 @@ function optionalNumber(value, fallback) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function listFromEnv(value, fallback = []) {
+  const raw = value === undefined || value === null || value === '' ? fallback.join(',') : value;
+  return String(raw)
+    .split(',')
+    .map(item => item.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 function getConfig() {
   const paypalEnvironment = process.env.PAYPAL_ENVIRONMENT || 'sandbox';
   if (!PAYPAL_ENVIRONMENTS.has(paypalEnvironment)) {
@@ -41,6 +49,8 @@ function getConfig() {
       clientId: process.env.PAYPAL_CLIENT_ID || '',
       clientSecret: process.env.PAYPAL_CLIENT_SECRET || '',
       webhookId: process.env.PAYPAL_WEBHOOK_ID || '',
+      enabledFunding: listFromEnv(process.env.PAYPAL_ENABLED_FUNDING, ['paypal', 'paylater', 'venmo', 'card']),
+      disabledFunding: listFromEnv(process.env.PAYPAL_DISABLED_FUNDING),
       baseUrl: paypalEnvironment === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com'
     },
     adminOrderEmail: process.env.ADMIN_ORDER_EMAIL || '',

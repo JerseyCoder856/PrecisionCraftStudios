@@ -26,7 +26,7 @@ The previous implementation created and captured PayPal orders entirely in the b
 - Migration runner and initial payment schema.
 - Server-side catalog and cart normalization.
 - Server-side PayPal access token, order creation, order capture, and webhook signature verification helpers.
-- Checkout frontend that calls server APIs and captures only server-created PayPal orders.
+- Checkout frontend that calls server APIs, captures only server-created PayPal orders, and explicitly renders the configured PayPal payment buttons when eligible.
 - Success page that can hydrate from persisted server order details.
 
 ## Security posture
@@ -53,6 +53,8 @@ Copy `.env.example` to `.env` and configure:
 | `PAYPAL_CLIENT_ID` | Yes | PayPal REST app client ID for the selected environment. |
 | `PAYPAL_CLIENT_SECRET` | Yes | PayPal REST app secret for the selected environment. |
 | `PAYPAL_WEBHOOK_ID` | Yes for webhooks | Webhook ID from the PayPal dashboard. |
+| `PAYPAL_ENABLED_FUNDING` | Optional | Comma-separated PayPal payment buttons to request and render when eligible. Defaults to `paypal,paylater,venmo,card`. |
+| `PAYPAL_DISABLED_FUNDING` | Optional | Comma-separated funding sources to suppress. Leave blank by default. |
 | `REQUEST_SIZE_LIMIT` | Optional | Reserved request body limit configuration. Defaults to `1mb`. |
 | `ADMIN_ORDER_EMAIL` | Optional | Operations metadata only. |
 | `FORMSPREE_ENDPOINT` | Optional | Legacy metadata only; not used for payment persistence. |
@@ -73,7 +75,7 @@ This creates:
 
 ## Frontend changes
 
-- `checkout.html` now loads PayPal SDK dynamically from `/api/config`.
+- `checkout.html` now loads PayPal SDK dynamically from `/api/config` with configured funding buttons (`paypal,paylater,venmo,card` by default).
 - PayPal `createOrder` now calls `/api/orders` instead of creating an order in the browser.
 - PayPal `onApprove` now calls `/api/orders/:paypalOrderId/capture` instead of browser capture.
 - Payment cancellation and errors are surfaced in the checkout UI.
@@ -157,3 +159,4 @@ This creates:
 - PayPal REST authentication: https://developer.paypal.com/api/rest/authentication
 - PayPal webhooks overview and retry behavior: https://developer.paypal.com/api/rest/webhooks/
 - PayPal webhook signature verification API: https://developer.paypal.com/docs/api/webhooks/v1/#verify-webhook-signature
+- PayPal standalone payment buttons and funding source customization: https://developer.paypal.com/docs/checkout/standard/customize/standalone-buttons/
