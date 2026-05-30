@@ -222,6 +222,7 @@
 </div>
 
 <script>
+  const STATIC_PAYPAL_CLIENT_ID = 'Afkvlk0ouuGHnTWaNNWclJn68FXH2sTTrHdrgL0wSlszyii6X3eVVIMbX-qNm6wjH5RFN0TXndjSAybT';
   const quantityEnabledProducts = ['Custom Sticker Pack', 'Logo Sticker Pack', "Custom Signature Snapback's"];
   const cart = (JSON.parse(localStorage.getItem('pcs_cart')) || []).map(item =>
     quantityEnabledProducts.includes(item.name) || item.allowQuantity ? item : { ...item, qty: 1, allowQuantity: false }
@@ -234,7 +235,8 @@
     currency: 'USD',
     paypalEnabledFunding: ['paypal', 'paylater', 'venmo', 'card'],
     paypalDisabledFunding: [],
-    freeOrderCouponEnabled: false
+    freeOrderCouponEnabled: false,
+    serverBackedPayments: true
   };
   let paypalButtonsRendered = false;
   let activeOrder = null;
@@ -365,21 +367,82 @@
     return data;
   }
 
-  async function createServerOrder() {
+  function staticCheckoutConfig(reason = '') {
+    return {
+      paypalClientId: STATIC_PAYPAL_CLIENT_ID,
+      currency: 'USD',
+      paypalEnabledFunding: ['paypal', 'paylater', 'venmo', 'card'],
+      paypalDisabledFunding: [],
+      freeOrderCouponEnabled: false,
+      serverBackedPayments: false,
+      fallbackReason: reason
+    };
+  }
+
+  async function getCheckoutConfig() {
+    try {
+      const config = await apiFetch('/api/config');
+      if (!config.paypalClientId) throw new Error('PayPal is not configured on this server.');
+      return { ...config, serverBackedPayments: true };
+    } catch (err) {
+      console.warn('Server checkout config unavailable; loading static PayPal buttons instead.', err);
+      return staticCheckoutConfig(err.message);
+    }
+  }
+
+  async function createPayPalOrder(data, actions) {
     const customer = validateCustomer();
-    if (!cart.length) throw new Error('Your cart is empty.');
-    const data = await apiFetch('/api/orders', {
+    const total = getTotal();
+    if (!cart.length || total <= 0) throw new Error('Your cart is empty.');
+
+    if (!checkoutConfig.serverBackedPayments) {
+      return actions.order.create({
+        purchase_units: [{
+          amount: { value: total.toFixed(2) },
+          description: 'Precision Craft Studios Order'
+        }]
+      });
+    }
+
+    const response = await apiFetch('/api/orders', {
       method: 'POST',
       body: JSON.stringify({ cart, customer, idempotencyKey: buildIdempotencyKey() })
     });
-    activeOrder = data.order;
-    return data.order.paypalOrderId;
+    activeOrder = response.order;
+    return response.order.paypalOrderId;
   }
 
   async function captureServerOrder(paypalOrderId) {
     const data = await apiFetch(`/api/orders/${encodeURIComponent(paypalOrderId)}/capture`, { method: 'POST' });
     activeOrder = data.order;
     return data.order;
+  }
+
+  async function captureStaticOrder(actions) {
+    const details = await actions.order.capture();
+    const customer = getCustomer();
+    const order = {
+      id: `PCS-${Date.now()}`,
+      customer,
+      items: cart.map(item => ({
+        productId: item.productId || item.name,
+        name: item.name,
+        quantity: item.qty || 1,
+        unitAmount: Number(item.price || 0).toFixed(2),
+        totalAmount: (Number(item.price || 0) * Number(item.qty || 1)).toFixed(2),
+        currency: 'USD',
+        customization: item.customization || null,
+        image: item.image || ''
+      })),
+      subtotal: getSubtotal().toFixed(2),
+      total: getTotal().toFixed(2),
+      status: details.status || 'COMPLETED',
+      paypalOrderId: details.id,
+      completedAt: new Date().toISOString(),
+      payment: details
+    };
+    activeOrder = order;
+    return order;
   }
 
   async function showPaymentSharePopup(success, context = {}) {
@@ -445,17 +508,19 @@
   function buttonOptions(fundingSource) {
     const options = {
       style: { layout: 'vertical', color: 'black', shape: 'rect', label: 'pay' },
-      createOrder: async () => createServerOrder(),
-      onApprove: async (data) => {
+      createOrder: async (data, actions) => createPayPalOrder(data, actions),
+      onApprove: async (data, actions) => {
         try {
-          const order = await captureServerOrder(data.orderID);
+          const order = checkoutConfig.serverBackedPayments
+            ? await captureServerOrder(data.orderID)
+            : await captureStaticOrder(actions);
           localStorage.setItem('pcs_lastOrder', JSON.stringify({
             orderId: order.id,
             customer: order.customer,
             cart: order.items,
             subtotal: order.subtotal,
             total: order.total,
-            payment: { status: order.status, paypalOrderId: order.paypalOrderId }
+            payment: order.payment || { status: order.status, paypalOrderId: order.paypalOrderId }
           }));
           localStorage.removeItem('pcs_cart');
           await showPaymentSharePopup(true, { shareText: `Thank you for your order from Precision Craft Studios. Order ${order.id}.` });
@@ -518,9 +583,8 @@
     const container = document.getElementById('paypal-button-container');
     if (paypalButtonsRendered || !cart.length) return;
     try {
-      const config = await apiFetch('/api/config');
+      const config = await getCheckoutConfig();
       checkoutConfig = config;
-      if (!config.paypalClientId) throw new Error('PayPal is not configured on this server.');
       await loadPayPalSdk(config);
       renderStandalonePayPalButtons(container, config);
       paypalButtonsRendered = true;

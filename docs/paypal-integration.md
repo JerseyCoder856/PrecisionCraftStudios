@@ -26,7 +26,7 @@ The previous implementation created and captured PayPal orders entirely in the b
 - Migration runner and initial payment schema.
 - Server-side catalog and cart normalization.
 - Server-side PayPal access token, order creation, order capture, and webhook signature verification helpers.
-- Checkout frontend that calls server APIs, captures only server-created PayPal orders, and explicitly renders the configured PayPal payment buttons when eligible.
+- Checkout frontend that calls server APIs, captures server-created PayPal orders when the backend is available, and explicitly renders the configured PayPal payment buttons when eligible. It also restores the previous static PayPal button behavior as a fallback so buttons still appear if the page is opened without the Node backend.
 - Success page that can hydrate from persisted server order details.
 
 ## Security posture
@@ -75,7 +75,7 @@ This creates:
 
 ## Frontend changes
 
-- `checkout.html` now loads PayPal SDK dynamically from `/api/config` with configured funding buttons (`paypal,paylater,venmo,card` by default).
+- `checkout.html` now loads PayPal SDK dynamically from `/api/config` with configured funding buttons (`paypal,paylater,venmo,card` by default), and falls back to the previous public PayPal client ID if `/api/config` is unavailable.
 - PayPal `createOrder` now calls `/api/orders` instead of creating an order in the browser.
 - PayPal `onApprove` now calls `/api/orders/:paypalOrderId/capture` instead of browser capture.
 - Payment cancellation and errors are surfaced in the checkout UI.
@@ -148,7 +148,7 @@ This creates:
 - `PUBLIC_BASE_URL` is HTTPS and matches the deployed domain.
 - Database file is on persistent storage and backed up.
 - Logs are collected by the hosting platform.
-- Fulfillment process only ships orders with `status = 'COMPLETED'`.
+- Fulfillment process only ships orders with `status = 'COMPLETED'` from the backend database; the static fallback is for keeping legacy PayPal buttons visible and should not be treated as the production source of truth.
 - PayPal dashboard webhook delivery logs have no recurring failures.
 - The product catalog in `src/server/catalog.js` is updated whenever storefront products/prices change.
 
