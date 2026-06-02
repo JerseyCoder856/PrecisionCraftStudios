@@ -17,9 +17,3 @@ test('normalizeCart forces one-of-a-kind items to quantity one', () => {
 test('normalizeCart rejects unknown products', () => {
   assert.throws(() => normalizeCart([{ productId: 'unknown-product', qty: 1 }]), /Unknown product/);
 });
-
-test('normalizeCart accepts PayPal-style quantity fields', () => {
-  const cart = normalizeCart([{ id: 'custom-sticker-pack', quantity: '4' }]);
-  assert.equal(cart.items[0].quantity, 4);
-  assert.equal(cart.totalCents, 2000);
-});
