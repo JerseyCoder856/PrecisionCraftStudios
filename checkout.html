@@ -368,13 +368,27 @@
     return `checkout-${Date.now()}-${Math.abs(hash)}`;
   }
 
+  function paypalErrorMessage(orderData) {
+    const errorDetail = orderData?.details?.[0];
+    if (errorDetail) {
+      const debugId = orderData.debug_id ? ` (${orderData.debug_id})` : '';
+      return `${errorDetail.issue || 'PayPal error'} ${errorDetail.description || ''}${debugId}`.trim();
+    }
+    return orderData?.error || JSON.stringify(orderData);
+  }
+
   async function apiFetch(url, options = {}) {
     const response = await fetch(url, {
       ...options,
       headers: { 'Content-Type': 'application/json', Accept: 'application/json', ...options.headers }
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || `Request failed (${response.status})`);
+    if (!response.ok) {
+      const error = new Error(paypalErrorMessage(data) || `Request failed (${response.status})`);
+      error.data = data;
+      error.status = response.status;
+      throw error;
+    }
     return data;
   }
 
@@ -416,18 +430,40 @@
       });
     }
 
-    const response = await apiFetch('/api/orders', {
+    const orderData = await apiFetch('/api/orders', {
       method: 'POST',
-      body: JSON.stringify({ cart, customer, idempotencyKey: buildIdempotencyKey() })
+      body: JSON.stringify({
+        cart: cart.map(item => ({
+          ...item,
+          id: item.productId || item.id || item.name,
+          quantity: String(item.qty || item.quantity || 1)
+        })),
+        customer,
+        idempotencyKey: buildIdempotencyKey()
+      })
     });
-    activeOrder = response.order;
-    return response.order.paypalOrderId;
+
+    if (orderData.id || orderData.order?.paypalOrderId) {
+      activeOrder = orderData.order || null;
+      return orderData.id || orderData.order.paypalOrderId;
+    }
+
+    throw new Error(paypalErrorMessage(orderData));
   }
 
   async function captureServerOrder(paypalOrderId) {
-    const data = await apiFetch(`/api/orders/${encodeURIComponent(paypalOrderId)}/capture`, { method: 'POST' });
-    activeOrder = data.order;
-    return data.order;
+    const orderData = await apiFetch(`/api/orders/${encodeURIComponent(paypalOrderId)}/capture`, { method: 'POST' });
+    const errorDetail = orderData?.details?.[0];
+
+    if (errorDetail) {
+      const error = new Error(paypalErrorMessage(orderData));
+      error.data = orderData;
+      throw error;
+    }
+    if (!orderData.order) throw new Error(paypalErrorMessage(orderData));
+
+    activeOrder = orderData.order;
+    return orderData.order;
   }
 
   async function captureStaticOrder(actions) {
@@ -520,8 +556,17 @@
 
   function buttonOptions(fundingSource) {
     const options = {
-      style: { layout: 'vertical', color: 'black', shape: 'rect', label: 'pay' },
-      createOrder: async (data, actions) => createPayPalOrder(data, actions),
+      style: { shape: 'rect', layout: 'vertical', color: 'gold', label: 'paypal' },
+      message: { amount: getTotal().toFixed(2) },
+      createOrder: async (data, actions) => {
+        try {
+          return await createPayPalOrder(data, actions);
+        } catch (err) {
+          console.error('Order creation error:', err);
+          setPaymentResult(`Could not initiate PayPal Checkout: ${err.message || err}`);
+          throw err;
+        }
+      },
       onApprove: async (data, actions) => {
         try {
           const order = checkoutConfig.serverBackedPayments
@@ -536,11 +581,14 @@
             payment: order.payment || { status: order.status, paypalOrderId: order.paypalOrderId }
           }));
           localStorage.removeItem('pcs_cart');
+          setPaymentResult(`Transaction ${order.status}: ${order.paypalCaptureId || order.paypalOrderId || order.id}`, true);
           await showPaymentSharePopup(true, { shareText: `Thank you for your order from Precision Craft Studios. Order ${order.id}.` });
           window.location.href = `success.html?order=${encodeURIComponent(order.id)}`;
         } catch (err) {
           console.error('Order capture error:', err);
-          setPaymentResult(err.message || 'There was an error processing your payment.');
+          const errorDetail = err.data?.details?.[0];
+          if (errorDetail?.issue === 'INSTRUMENT_DECLINED' && actions?.restart) return actions.restart();
+          setPaymentResult(`Sorry, your transaction could not be processed: ${err.message || err}`);
           await showPaymentSharePopup(false);
         }
       },
