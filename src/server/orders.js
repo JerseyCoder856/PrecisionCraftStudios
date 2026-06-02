@@ -103,7 +103,7 @@ async function handleCreateOrder(req, res, next, config) {
 
     const saved = findOrderByPayPalOrderId(paypalOrder.id);
     console.log('Created PayPal order', { publicId, paypalOrderId: paypalOrder.id, total: formatMoney(cart.totalCents) });
-    res.status(201).json({ id: paypalOrder.id, order: serializeOrder(saved) });
+    res.status(201).json({ order: serializeOrder(saved) });
   } catch (err) { next(err); }
 }
 
@@ -120,7 +120,7 @@ async function handleCaptureOrder(req, res, next, config) {
     const db = getDb();
     const order = findOrderByPayPalOrderId(paypalOrderId);
     if (!order) return res.status(404).json({ error: 'Order not found.' });
-    if (order.status === 'COMPLETED') return res.json({ id: paypalOrderId, status: order.status, order: serializeOrder(order) });
+    if (order.status === 'COMPLETED') return res.json({ order: serializeOrder(order) });
     if (!['CREATED', 'APPROVED'].includes(order.status)) return res.status(409).json({ error: `Order cannot be captured from status ${order.status}.` });
 
     const captureResponse = await capturePayPalOrder(config, paypalOrderId, `capture-${order.publicId}`);
@@ -143,7 +143,7 @@ async function handleCaptureOrder(req, res, next, config) {
     `).run(capture.id, json(captureResponse), now, now, paypalOrderId);
     const completed = findOrderByPayPalOrderId(paypalOrderId);
     console.log('Captured PayPal order', { publicId: order.publicId, paypalOrderId, captureId: capture.id });
-    res.json({ ...captureResponse, order: serializeOrder(completed) });
+    res.json({ order: serializeOrder(completed) });
   } catch (err) { next(err); }
 }
 
