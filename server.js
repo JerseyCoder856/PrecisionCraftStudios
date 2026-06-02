@@ -46,7 +46,8 @@ function adapt(req, res, params = {}) {
 function handleError(err, res) {
   const status = err.status || err.statusCode || 500;
   if (status >= 500) console.error(err); else console.warn(err.message);
-  sendJson(res, status, { error: err.message || 'Internal server error' });
+  const paypalPayload = err.paypal && typeof err.paypal === 'object' ? err.paypal : {};
+  sendJson(res, status, { ...paypalPayload, error: err.message || paypalPayload.message || 'Internal server error' });
 }
 
 async function routeApi(req, res, url) {

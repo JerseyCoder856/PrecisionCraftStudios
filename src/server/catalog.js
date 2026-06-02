@@ -125,7 +125,7 @@ function normalizeCart(rawCart) {
       throw err;
     }
 
-    const qty = normalizeQuantity(product, rawItem.qty);
+    const qty = normalizeQuantity(product, rawItem.qty ?? rawItem.quantity);
     const customization = rawItem.customization && typeof rawItem.customization === 'object' ? rawItem.customization : null;
     const key = product.allowQuantity && !customization ? product.id : `${product.id}:${itemsByProduct.size}`;
     const existing = itemsByProduct.get(key);
