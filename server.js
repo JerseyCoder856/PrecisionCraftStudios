@@ -60,6 +60,7 @@ async function routeApi(req, res, url) {
       currency: 'USD',
       paypalEnabledFunding: config.paypal.enabledFunding,
       paypalDisabledFunding: config.paypal.disabledFunding,
+      paypalBuyerCountry: config.paypal.buyerCountry,
       freeOrderCouponEnabled: false
     });
   }
