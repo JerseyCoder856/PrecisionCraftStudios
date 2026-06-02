@@ -51,6 +51,7 @@ function getConfig() {
       webhookId: process.env.PAYPAL_WEBHOOK_ID || '',
       enabledFunding: listFromEnv(process.env.PAYPAL_ENABLED_FUNDING, ['paypal', 'paylater', 'venmo', 'card']),
       disabledFunding: listFromEnv(process.env.PAYPAL_DISABLED_FUNDING),
+      buyerCountry: process.env.PAYPAL_BUYER_COUNTRY || 'US',
       baseUrl: paypalEnvironment === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com'
     },
     adminOrderEmail: process.env.ADMIN_ORDER_EMAIL || '',

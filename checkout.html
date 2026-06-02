@@ -119,6 +119,8 @@
   .coupon-btn { border: 1.5px solid var(--black); background: var(--black); color: #fff; padding: 0 16px; font-size: 0.76rem; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; border-radius: 3px; }
   .coupon-msg { margin-top: 8px; font-size: .82rem; color: var(--gray); min-height: 18px; }
   .coupon-msg.success { color: var(--mint-deep); font-weight: 500; }
+  .payment-result-message { min-height: 18px; margin-top: 10px; color: #b83232; font-size: .82rem; text-align: center; }
+  .payment-result-message.success { color: var(--mint-deep); font-weight: 500; }
   .free-checkout-btn { width: 100%; margin-top: 12px; border: 2px solid var(--mint-deep); background: var(--mint-deep); color: #fff; padding: 12px 16px; border-radius: 3px; font-size: .78rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
   .free-checkout-btn:hover { filter: brightness(.95); }
   .free-checkout-btn:disabled { opacity: .6; cursor: not-allowed; }
@@ -212,6 +214,7 @@
       <div class="paypal-section">
         <div class="paypal-label">Complete your payment securely with PayPal</div>
         <div id="paypal-button-container"><div class="paypal-loading">Loading payment…</div></div>
+        <p id="result-message" class="payment-result-message" aria-live="polite"></p>
       </div>
 
       <div class="secure-badge">
@@ -222,7 +225,7 @@
 </div>
 
 <script>
-  const STATIC_PAYPAL_CLIENT_ID = 'Afkvlk0ouuGHnTWaNNWclJn68FXH2sTTrHdrgL0wSlszyii6X3eVVIMbX-qNm6wjH5RFN0TXndjSAybT';
+  const STATIC_PAYPAL_CLIENT_ID = 'AbXrEojdTjfYNt3CrJ4g-UyVEyW-WP5iH-FWpXcCx6Fl6Xoir3sW7Canw8JE_M2cXF5mBYbgmDbV4tva';
   const quantityEnabledProducts = ['Custom Sticker Pack', 'Logo Sticker Pack', "Custom Signature Snapback's"];
   const cart = (JSON.parse(localStorage.getItem('pcs_cart')) || []).map(item =>
     quantityEnabledProducts.includes(item.name) || item.allowQuantity ? item : { ...item, qty: 1, allowQuantity: false }
@@ -235,6 +238,7 @@
     currency: 'USD',
     paypalEnabledFunding: ['paypal', 'paylater', 'venmo', 'card'],
     paypalDisabledFunding: [],
+    paypalBuyerCountry: 'US',
     freeOrderCouponEnabled: false,
     serverBackedPayments: true
   };
@@ -344,6 +348,13 @@
     el.classList.toggle('success', ok);
   }
 
+  function setPaymentResult(message, ok = false) {
+    const el = document.getElementById('result-message');
+    if (!el) return;
+    el.textContent = message;
+    el.classList.toggle('success', ok);
+  }
+
   function updatePaymentVisibility() {
     document.getElementById('paypal-button-container').style.display = discountApplied ? 'none' : 'flex';
     document.getElementById('freeCheckoutBtn').style.display = discountApplied ? 'block' : 'none';
@@ -373,6 +384,7 @@
       currency: 'USD',
       paypalEnabledFunding: ['paypal', 'paylater', 'venmo', 'card'],
       paypalDisabledFunding: [],
+      paypalBuyerCountry: 'US',
       freeOrderCouponEnabled: false,
       serverBackedPayments: false,
       fallbackReason: reason
@@ -487,13 +499,14 @@
   function sdkFundingParams(config) {
     const params = new URLSearchParams({
       'client-id': config.paypalClientId,
+      'buyer-country': config.paypalBuyerCountry || 'US',
       currency: config.currency || 'USD',
       intent: 'capture',
       components: 'buttons,funding-eligibility'
     });
     const enabledFunding = normalizeFundingList(config.paypalEnabledFunding);
     const disabledFunding = normalizeFundingList(config.paypalDisabledFunding);
-    const sdkEnabledFunding = enabledFunding.filter(name => !['paypal', 'card'].includes(name));
+    const sdkEnabledFunding = enabledFunding.filter(name => name !== 'paypal');
     if (sdkEnabledFunding.length) params.set('enable-funding', sdkEnabledFunding.join(','));
     if (disabledFunding.length) params.set('disable-funding', disabledFunding.join(','));
     return params.toString();
@@ -527,14 +540,16 @@
           window.location.href = `success.html?order=${encodeURIComponent(order.id)}`;
         } catch (err) {
           console.error('Order capture error:', err);
+          setPaymentResult(err.message || 'There was an error processing your payment.');
           await showPaymentSharePopup(false);
         }
       },
       onCancel: () => {
-        setCouponMessage('PayPal checkout was cancelled. You can retry when ready.');
+        setPaymentResult('PayPal checkout was cancelled. You can retry when ready.');
       },
       onError: (err) => {
         console.error('PayPal error:', err);
+        setPaymentResult('There was an error loading or processing PayPal checkout.');
         showPaymentSharePopup(false);
       }
     };
@@ -573,6 +588,7 @@
       if (window.paypal) return resolve();
       const script = document.createElement('script');
       script.src = `https://www.paypal.com/sdk/js?${sdkFundingParams(config)}`;
+      script.dataset.sdkIntegrationSource = 'developer-studio';
       script.onload = resolve;
       script.onerror = () => reject(new Error('Unable to load the PayPal SDK.'));
       document.head.appendChild(script);
@@ -587,9 +603,11 @@
       checkoutConfig = config;
       await loadPayPalSdk(config);
       renderStandalonePayPalButtons(container, config);
+      setPaymentResult('');
       paypalButtonsRendered = true;
     } catch (err) {
       console.error(err);
+      setPaymentResult(err.message);
       container.innerHTML = `<div class="paypal-loading">${err.message}</div>`;
     }
   }

@@ -55,6 +55,7 @@ Copy `.env.example` to `.env` and configure:
 | `PAYPAL_WEBHOOK_ID` | Yes for webhooks | Webhook ID from the PayPal dashboard. |
 | `PAYPAL_ENABLED_FUNDING` | Optional | Comma-separated PayPal payment buttons to request and render when eligible. Defaults to `paypal,paylater,venmo,card`. |
 | `PAYPAL_DISABLED_FUNDING` | Optional | Comma-separated funding sources to suppress. Leave blank by default. |
+| `PAYPAL_BUYER_COUNTRY` | Optional | Two-letter buyer country passed to the PayPal JavaScript SDK. Defaults to `US`. |
 | `REQUEST_SIZE_LIMIT` | Optional | Reserved request body limit configuration. Defaults to `1mb`. |
 | `ADMIN_ORDER_EMAIL` | Optional | Operations metadata only. |
 | `FORMSPREE_ENDPOINT` | Optional | Legacy metadata only; not used for payment persistence. |
@@ -75,7 +76,7 @@ This creates:
 
 ## Frontend changes
 
-- `checkout.html` now loads PayPal SDK dynamically from `/api/config` with configured funding buttons (`paypal,paylater,venmo,card` by default), and falls back to the previous public PayPal client ID if `/api/config` is unavailable.
+- `checkout.html` now loads PayPal SDK dynamically from `/api/config` with configured funding buttons (`paypal,paylater,venmo,card` by default), buyer country (`US` by default), and the PayPal developer-studio integration source tag. It falls back to the supplied public PayPal client ID if `/api/config` is unavailable.
 - PayPal `createOrder` now calls `/api/orders` instead of creating an order in the browser.
 - PayPal `onApprove` now calls `/api/orders/:paypalOrderId/capture` instead of browser capture.
 - Payment cancellation and errors are surfaced in the checkout UI.
