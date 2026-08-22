@@ -171,35 +171,7 @@
       </div>
     </div>
 
-    <div class="panel-title" style="margin-top:30px;">Shipping <span>& Contact</span></div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">First Name</label>
-        <input type="text" id="firstName" class="form-input" placeholder="Jane">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Last Name</label>
-        <input type="text" id="lastName" class="form-input" placeholder="Doe">
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Email Address</label>
-      <input type="email" id="email" class="form-input" placeholder="you@email.com">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Phone (optional)</label>
-      <input type="tel" id="phone" class="form-input" placeholder="+1 (555) 000-0000">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Shipping Address</label>
-      <textarea id="address" class="form-textarea" placeholder="123 Main St, City, State, ZIP"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Order Notes (optional)</label>
-      <textarea id="notes" class="form-textarea" placeholder="Any special requests, custom design notes, or instructions…" style="min-height:70px;"></textarea>
-    </div>
-
-    <div class="panel-title" style="margin-top:12px;">Payment <span>Method</span></div>
+    <div class="panel-title" style="margin-top:30px;">Payment <span>Method</span></div>
 
       <div class="coupon-box">
         <div class="coupon-title">Have a discount code?</div>
@@ -247,22 +219,14 @@
 
   function getCustomer() {
     return {
-      name: (document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value).trim(),
-      email: document.getElementById('email').value.trim(),
-      phone: document.getElementById('phone').value.trim(),
-      address: document.getElementById('address').value.trim(),
-      notes: document.getElementById('notes').value.trim(),
+      checkoutSource: 'paypal',
       isGift: document.getElementById('isGift').checked,
       giftMessage: document.getElementById('giftMessage').value.trim()
     };
   }
 
   function validateCustomer() {
-    const customer = getCustomer();
-    if (!customer.name) throw new Error('Please enter your first and last name.');
-    if (!customer.email || !customer.email.includes('@')) throw new Error('Please enter a valid email address.');
-    if (!customer.address || customer.address.length < 5) throw new Error('Please enter your shipping address.');
-    return customer;
+    return getCustomer();
   }
 
   function getSubtotal() {

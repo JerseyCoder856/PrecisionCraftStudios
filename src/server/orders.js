@@ -17,13 +17,36 @@ function validateCustomer(customer = {}) {
     phone: String(customer.phone || '').trim().slice(0, 40),
     address: String(customer.address || '').trim().slice(0, 1000),
     notes: String(customer.notes || '').trim().slice(0, 2000),
+    checkoutSource: String(customer.checkoutSource || '').trim().slice(0, 40),
     isGift: Boolean(customer.isGift),
     giftMessage: String(customer.giftMessage || '').trim().slice(0, 1000)
   };
-  if (!normalized.name) throw Object.assign(new Error('Customer name is required.'), { status: 400 });
-  if (!/^\S+@\S+\.\S+$/.test(normalized.email)) throw Object.assign(new Error('A valid customer email is required.'), { status: 400 });
-  if (normalized.address.length < 5) throw Object.assign(new Error('Shipping address is required.'), { status: 400 });
   return normalized;
+}
+
+function formatShippingAddress(address = {}) {
+  return [
+    address.address_line_1,
+    address.address_line_2,
+    [address.admin_area_2, address.admin_area_1, address.postal_code].filter(Boolean).join(' '),
+    address.country_code
+  ].filter(Boolean).join(', ').slice(0, 1000);
+}
+
+function customerFromPayPal(customer = {}, captureResponse = {}) {
+  const payer = captureResponse.payer || {};
+  const shipping = captureResponse.purchase_units?.[0]?.shipping || {};
+  const payerName = [payer.name?.given_name, payer.name?.surname].filter(Boolean).join(' ');
+  const phone = payer.phone?.phone_number?.national_number || '';
+
+  return {
+    ...customer,
+    name: String(shipping.name?.full_name || payerName || customer.name || '').slice(0, 160),
+    email: String(payer.email_address || customer.email || '').slice(0, 254),
+    phone: String(phone || customer.phone || '').slice(0, 40),
+    address: formatShippingAddress(shipping.address) || customer.address || '',
+    checkoutSource: 'paypal'
+  };
 }
 
 function parseOrder(row) {
@@ -137,10 +160,12 @@ async function handleCaptureOrder(req, res, next, config) {
       return res.status(422).json({ error: 'Payment capture could not be verified.' });
     }
 
+    const completedCustomer = customerFromPayPal(order.customer, captureResponse);
+
     db.prepare(`
-      UPDATE orders SET status = 'COMPLETED', paypal_capture_id = ?, paypal_capture_json = ?, updated_at = ?, completed_at = ?
+      UPDATE orders SET status = 'COMPLETED', customer_json = ?, paypal_capture_id = ?, paypal_capture_json = ?, updated_at = ?, completed_at = ?
       WHERE paypal_order_id = ? AND status != 'COMPLETED'
-    `).run(capture.id, json(captureResponse), now, now, paypalOrderId);
+    `).run(json(completedCustomer), capture.id, json(captureResponse), now, now, paypalOrderId);
     const completed = findOrderByPayPalOrderId(paypalOrderId);
     console.log('Captured PayPal order', { publicId: order.publicId, paypalOrderId, captureId: capture.id });
     res.json({ order: serializeOrder(completed) });
@@ -205,4 +230,4 @@ async function handleWebhook(req, res, next, config) {
   } catch (err) { next(err); }
 }
 
-module.exports = { handleCreateOrder, handleCaptureOrder, handleWebhook, findOrderByPublicId, serializeOrder };
+module.exports = { handleCreateOrder, handleCaptureOrder, handleWebhook, findOrderByPublicId, serializeOrder, customerFromPayPal, validateCustomer };
