@@ -39,7 +39,7 @@
     font-weight: 300;
   }
 
-  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar { width: 12px; }
   ::-webkit-scrollbar-track { background: var(--white); }
   ::-webkit-scrollbar-thumb { background: var(--mint); border-radius: 3px; }
 
@@ -332,22 +332,23 @@
   .section-title em { font-style: italic; color: var(--mint-deep); }
 
   /* ─── ABOUT ─── */
-  #about {
+  #values {
     background: var(--white);
   }
   .about-values {
-    max-width: 980px;
+    max-width: 1200px;
     margin: 0 auto;
+    width: 100%;
   }
   .about-pillars {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 18px;
+    gap: clamp(16px, 3vw, 34px);
   }
   .pillar {
     background: var(--mint-pale);
     border-radius: 4px;
-    padding: 28px 22px;
+    padding: clamp(22px, 3vw, 34px) clamp(18px, 2.4vw, 28px);
     border-left: 3px solid var(--mint);
     min-height: 118px;
     display: flex;
@@ -355,13 +356,18 @@
     justify-content: center;
     text-align: center;
   }
+  .values-header { text-align: center; margin-bottom: 34px; }
+  .values-header .section-eyebrow { justify-content: center; }
+  .values-header .section-eyebrow::before { display: none; }
   .pillar-title {
     font-size: 0.86rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--black);
+    margin-bottom: 8px;
   }
+  .pillar-desc { font-size: 0.85rem; color: var(--gray); line-height: 1.6; }
 
   /* ─── SHOP ─── */
   #shop { background: var(--mint-pale); }
@@ -392,7 +398,7 @@
     justify-content: center;
     gap: 8px;
   }
-  .filter-btn svg { width: 15px; height: 15px; stroke-width: 1.8; flex-shrink: 0; }
+  .filter-btn svg { width: 30px; height: 30px; stroke-width: 1.8; flex-shrink: 0; }
   .filter-btn.active, .filter-btn:hover { border-color: var(--mint); color: var(--black); background: var(--mint-pale); }
 
   .products-grid {
@@ -466,8 +472,7 @@
     font-weight: 600;
   }
   .product-badge.new { background: var(--mint-deep); }
-  .product-badge.sold { background: var(--black); color: var(--white); }
-  .sold-status { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--black); border: 1.5px solid var(--black); border-radius: 2px; padding: 8px 14px; background: var(--white); }
+  .product-badge.sold { background: var(--black); color: var(--white); font-size: 0.78rem; letter-spacing: 0.16em; padding: 7px 15px; }
   .product-info { padding: 20px; }
   .product-category { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mint-deep); font-weight: 500; margin-bottom: 6px; }
   .product-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; color: var(--black); margin-bottom: 4px; line-height: 1.2; }
@@ -761,7 +766,7 @@
     <div class="nav-brand">Precision Craft Studios<span>Crafting What Brings Joy</span></div>
   </a>
   <ul class="nav-links">
-    <li><a href="#about">About</a></li>
+    <li><a href="#values">Values</a></li>
     <li><a href="#shop">Shop</a></li>
     <li><a href="#gallery">Gallery</a></li>
     <li><a href="#reviews">Reviews</a></li>
@@ -782,7 +787,7 @@
 
 <!-- Mobile Menu -->
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#about" onclick="closeMobileMenu()">About</a>
+  <a href="#values" onclick="closeMobileMenu()">Values</a>
   <a href="#shop" onclick="closeMobileMenu()">Shop</a>
   <a href="#gallery" onclick="closeMobileMenu()">Gallery</a>
   <a href="#reviews" onclick="closeMobileMenu()">Reviews</a>
@@ -817,14 +822,18 @@
   </div>
 </section>
 
-<!-- ─── ABOUT ─── -->
-<section id="about">
+<!-- ─── VALUES ─── -->
+<section id="values">
   <div class="about-values">
+    <div class="values-header">
+      <div class="section-eyebrow">Values</div>
+      <h2 class="section-title">Values</h2>
+    </div>
     <div class="about-pillars">
-      <div class="pillar"><div class="pillar-title">Precision</div></div>
-      <div class="pillar"><div class="pillar-title">Creativity</div></div>
-      <div class="pillar"><div class="pillar-title">Quality</div></div>
-      <div class="pillar"><div class="pillar-title">Joy</div></div>
+      <div class="pillar"><div><div class="pillar-title">Precision</div><div class="pillar-desc">Every detail is intentional, clean, and refined down to the last element.</div></div></div>
+      <div class="pillar"><div><div class="pillar-title">Creativity</div><div class="pillar-desc">Unlimited customization driven by imagination and artistic vision.</div></div></div>
+      <div class="pillar"><div><div class="pillar-title">Quality</div><div class="pillar-desc">Premium materials that hold up beautifully through everyday life.</div></div></div>
+      <div class="pillar"><div><div class="pillar-title">Joy</div><div class="pillar-desc">We craft what brings happiness — to you and everyone who sees it.</div></div></div>
     </div>
   </div>
 </section>
@@ -965,7 +974,6 @@
         <div class="product-desc">Hand-painted with a custom design. Structured fit, premium fabric.</div>
         <div class="product-footer">
           <div class="product-price">$20.00</div>
-          <div class="sold-status" aria-label="Sold">Sold</div>
         </div>
       </div>
     </div>
@@ -1199,7 +1207,7 @@
       <p>Handmade with heart, designed with precision. We create custom goods that bring joy to everyday life.</p>
     </div>
     <div class="footer-col"><h4>Shop</h4><ul><li><a href="#shop">Custom Hats</a></li><li><a href="#shop">Custom Stickers</a></li><li><a href="#shop">Bundle Sets</a></li><li><a href="#shop">New Arrivals</a></li></ul></div>
-    <div class="footer-col"><h4>Studio</h4><ul><li><a href="#about">Our Story</a></li><li><a href="#gallery">Gallery</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#contact">Custom Orders</a></li></ul></div>
+    <div class="footer-col"><h4>Studio</h4><ul><li><a href="#values">Values</a></li><li><a href="#gallery">Gallery</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#contact">Custom Orders</a></li></ul></div>
     <div class="footer-col"><h4>Support</h4><ul><li><a href="#contact">Contact Us</a></li><li><a href="#">Shipping Info</a></li><li><a href="#">Returns</a></li><li><a href="#">FAQs</a></li></ul></div>
   </div>
   <div class="footer-bottom">
