@@ -334,6 +334,8 @@
   /* ─── ABOUT ─── */
   #values {
     background: var(--white);
+    padding-top: 56px;
+    padding-bottom: 96px;
   }
   .about-values {
     max-width: 1200px;
@@ -343,31 +345,37 @@
   .about-pillars {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: clamp(16px, 3vw, 34px);
+    gap: clamp(18px, 2.5vw, 30px);
   }
   .pillar {
     background: var(--mint-pale);
-    border-radius: 4px;
-    padding: clamp(22px, 3vw, 34px) clamp(18px, 2.4vw, 28px);
-    border-left: 3px solid var(--mint);
-    min-height: 118px;
+    border-radius: 10px;
+    padding: clamp(36px, 4vw, 52px) clamp(24px, 3vw, 38px);
+    border: 1px solid rgba(142, 202, 174, 0.42);
+    border-top: 4px solid var(--mint);
+    min-height: 254px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
+    box-shadow: var(--shadow);
+    transition: transform var(--transition), box-shadow var(--transition);
   }
-  .values-header { text-align: center; margin-bottom: 34px; }
+  .pillar:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+  .pillar > div { display: flex; flex-direction: column; align-items: center; }
+  .pillar-icon { width: 48px; height: 48px; margin-bottom: 22px; color: var(--mint-deep); stroke-width: 1.65; }
+  .values-header { text-align: center; margin-bottom: 42px; }
   .values-header .section-eyebrow { justify-content: center; }
   .values-header .section-eyebrow::before { display: none; }
   .pillar-title {
-    font-size: 0.86rem;
+    font-size: 1.05rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--black);
-    margin-bottom: 8px;
+    margin-bottom: 12px;
   }
-  .pillar-desc { font-size: 0.85rem; color: var(--gray); line-height: 1.6; }
+  .pillar-desc { font-size: 1rem; color: var(--gray); line-height: 1.65; }
 
   /* ─── SHOP ─── */
   #shop { background: var(--mint-pale); }
@@ -440,6 +448,7 @@
     display: block;
   }
   .zoomable-product-image { cursor: zoom-in; }
+  .product-image:focus-visible { outline: 3px solid var(--mint-deep); outline-offset: 3px; }
   .zoomed-product-image { transform: scale(1.12); transform-origin: center center; }
   .zoomed-product-image.top-focus { transform: scale(1.2); object-position: center 18%; }
   .product-image-overlay {
@@ -472,7 +481,7 @@
     font-weight: 600;
   }
   .product-badge.new { background: var(--mint-deep); }
-  .product-badge.sold { background: var(--black); color: var(--white); font-size: 0.78rem; letter-spacing: 0.16em; padding: 7px 15px; }
+  .product-badge.sold { background: #c93232; color: var(--white); font-size: 0.78rem; letter-spacing: 0.16em; padding: 7px 15px; }
   .product-info { padding: 20px; }
   .product-category { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mint-deep); font-weight: 500; margin-bottom: 6px; }
   .product-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; color: var(--black); margin-bottom: 4px; line-height: 1.2; }
@@ -604,6 +613,7 @@
     align-items: center;
     justify-content: center;
     padding: 24px;
+    overscroll-behavior: contain;
   }
   .image-modal.open { display: flex; }
   .image-modal-content {
@@ -636,7 +646,9 @@
     color: #fff;
     cursor: pointer;
     font-size: 1rem;
+    z-index: 1;
   }
+  .image-modal-close:hover, .image-modal-close:focus-visible { background: var(--black); outline: 2px solid var(--mint); outline-offset: 2px; }
 
   /* ─── REVIEWS ─── */
   #reviews { background: var(--mint-pale); }
@@ -654,7 +666,7 @@
   .review-product { font-size: 0.72rem; color: var(--gray); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
 
   /* ─── CONTACT ─── */
-  #contact { background: linear-gradient(135deg, var(--white) 0%, var(--mint-pale) 100%); display: grid; grid-template-columns: minmax(0, .9fr) minmax(360px, 1.1fr); gap: 58px; align-items: start; }
+  #contact { background: linear-gradient(135deg, var(--white) 0%, var(--mint-pale) 100%); display: grid; grid-template-columns: minmax(0, .9fr) minmax(360px, 1.1fr); gap: clamp(32px, 5vw, 58px); align-items: center; padding: 64px max(5%, calc((100% - 1240px) / 2)); }
   .contact-info { max-width: 500px; }
   .contact-tagline { font-size: 1rem; color: var(--gray); line-height: 1.8; margin-bottom: 32px; font-weight: 300; }
   .contact-socials { display: flex; gap: 14px; margin-bottom: 32px; }
@@ -735,6 +747,15 @@
     .contact-detail { width: 100%; border-radius: 14px; }
     .hero-visual { height: 260px; }
     .about-pillars { grid-template-columns: 1fr; }
+    #values { padding-top: 52px; padding-bottom: 72px; }
+    .values-header { margin-bottom: 30px; }
+    .pillar { min-height: 220px; padding: 34px 28px; }
+    .pillar-icon { width: 42px; height: 42px; margin-bottom: 18px; }
+    .pillar-desc { font-size: 0.95rem; }
+    .image-modal { padding: 14px; }
+    .image-modal-content { width: 100%; max-height: 92vh; overflow-y: auto; }
+    .preview-details { padding: 24px 20px; }
+    .image-modal-content img { max-height: 56vh; }
   }
 </style>
 </head>
@@ -830,10 +851,10 @@
       <h2 class="section-title">Values</h2>
     </div>
     <div class="about-pillars">
-      <div class="pillar"><div><div class="pillar-title">Precision</div><div class="pillar-desc">Every detail is intentional, clean, and refined down to the last element.</div></div></div>
-      <div class="pillar"><div><div class="pillar-title">Creativity</div><div class="pillar-desc">Unlimited customization driven by imagination and artistic vision.</div></div></div>
-      <div class="pillar"><div><div class="pillar-title">Quality</div><div class="pillar-desc">Premium materials that hold up beautifully through everyday life.</div></div></div>
-      <div class="pillar"><div><div class="pillar-title">Joy</div><div class="pillar-desc">We craft what brings happiness — to you and everyone who sees it.</div></div></div>
+      <div class="pillar"><div><svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg><div class="pillar-title">Precision</div><div class="pillar-desc">Every detail is intentional, clean, and refined down to the last element.</div></div></div>
+      <div class="pillar"><div><svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M8.4 14.6A7 7 0 1 1 15.6 14.6c-.9.7-1.6 1.6-1.6 2.7h-4c0-1.1-.7-2-1.6-2.7Z"></path><path d="M12 3V1M4.9 5.1 3.5 3.7M19.1 5.1l1.4-1.4"></path></svg><div class="pillar-title">Creativity</div><div class="pillar-desc">Unlimited customization driven by imagination and artistic vision.</div></div></div>
+      <div class="pillar"><div><svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M12 3 14.8 5.2l3.5-.2.7 3.4 2.8 2.1-1.8 3 1 3.3-3.3 1.2-1.8 3-3.2-1.5-3.2 1.5-1.8-3-3.3-1.2 1-3.3-1.8-3L5 8.4 5.7 5l3.5.2L12 3Z"></path><path d="m8.7 12.2 2.2 2.2 4.5-4.7"></path></svg><div class="pillar-title">Quality</div><div class="pillar-desc">Premium materials that hold up beautifully through everyday life.</div></div></div>
+      <div class="pillar"><div><svg class="pillar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M8 10h.01M16 10h.01M8 14.5c1.1 1 2.4 1.5 4 1.5s2.9-.5 4-1.5"></path></svg><div class="pillar-title">Joy</div><div class="pillar-desc">We craft what brings happiness — to you and everyone who sees it.</div></div></div>
     </div>
   </div>
 </section>
@@ -857,7 +878,7 @@
     <!-- PRODUCT 1.a -->
     <div class="product-card" data-category="hats">
       <div class="product-image">
-        <img src="https://i.imgur.com/S7gn8BC.jpeg" alt="Signature Painted Cap" class="zoomable-product-image" onclick="openProductPreview(this)">
+        <img src="https://i.imgur.com/S7gn8BC.jpeg" alt="Signature Painted Cap" class="zoomable-product-image">
         <div class="product-image-overlay"></div>
       </div>
       <div class="product-info">
@@ -950,7 +971,7 @@
      <!-- PRODUCT 1.b -->
     <div class="product-card" data-category="hats">
       <div class="product-image">
-        <img src="https://i.imgur.com/XmdDdAC.jpeg" alt="PUERTO RICO Signature Snapback - sold" class="zoomable-product-image" onclick="openProductPreview(this)">
+        <img src="https://i.imgur.com/XmdDdAC.jpeg" alt="PUERTO RICO Signature Snapback - sold" class="zoomable-product-image">
         <span class="product-badge sold">Sold</span>
         <div class="product-image-overlay"></div>
       </div>
@@ -967,7 +988,7 @@
     <!-- PRODUCT 1.c -->
     <div class="product-card" data-category="hats">
       <div class="product-image">
-        <img src="https://i.imgur.com/IRw2XyS.jpeg" alt="Signature Painted Cap" class="zoomable-product-image" onclick="openProductPreview(this)">
+        <img src="https://i.imgur.com/IRw2XyS.jpeg" alt="Signature Painted Cap" class="zoomable-product-image">
         <div class="product-image-overlay"></div>
       </div>
       <div class="product-info">
@@ -984,7 +1005,7 @@
     <!-- PRODUCT 1.d -->
     <div class="product-card" data-category="hats">
       <div class="product-image">
-        <img src="https://i.imgur.com/uBWFn2d.jpeg" alt="Signature Painted Cap" class="zoomable-product-image" onclick="openProductPreview(this)">
+        <img src="https://i.imgur.com/uBWFn2d.jpeg" alt="Signature Painted Cap" class="zoomable-product-image">
         <div class="product-image-overlay"></div>
       </div>
       <div class="product-info">
@@ -1005,7 +1026,7 @@
 <!-- PRODUCT -->
 <div class="product-card" data-category="hats">
   <div class="product-image">
-    <img src="IMG_9138.jpeg" alt="Jesus Saves Signature Snapback" class="zoomed-product-image top-focus zoomable-product-image" onclick="openProductPreview(this)">
+    <img src="IMG_9138.jpeg" alt="Jesus Saves Signature Snapback" class="zoomed-product-image top-focus zoomable-product-image">
     <div class="product-image-overlay"></div>
   </div>
 
@@ -1026,7 +1047,7 @@
 <!-- PRODUCT -->
 <div class="product-card" data-category="hats">
   <div class="product-image">
-    <img src="IMG_9145.jpeg" alt="Camden Signature Snapback" class="zoomed-product-image zoomable-product-image" onclick="openProductPreview(this)">
+    <img src="IMG_9145.jpeg" alt="Camden Signature Snapback" class="zoomed-product-image zoomable-product-image">
     <div class="product-image-overlay"></div>
   </div>
 
@@ -1047,7 +1068,7 @@
 <!-- PRODUCT -->
 <div class="product-card" data-category="hats">
   <div class="product-image">
-    <img src="IMG_9143.jpeg" alt="Puerto Rico Hat" class="zoomed-product-image zoomable-product-image" onclick="openProductPreview(this)">
+    <img src="IMG_9143.jpeg" alt="Puerto Rico Hat" class="zoomed-product-image zoomable-product-image">
     <div class="product-image-overlay"></div>
   </div>
 
@@ -1336,9 +1357,9 @@
 
 <!-- ─── TOAST ─── -->
 <div class="toast" id="toast"></div>
-<div class="image-modal" id="imageModal" onclick="closeImageModal(event)">
+<div class="image-modal" id="imageModal" role="dialog" aria-modal="true" aria-labelledby="previewTitle" aria-hidden="true" onclick="closeImageModal(event)">
   <div class="image-modal-content" onclick="event.stopPropagation()">
-    <button class="image-modal-close" onclick="closeImageModal(event)">✕</button>
+    <button class="image-modal-close" type="button" aria-label="Close image preview" onclick="closeImageModal(event)">✕</button>
     <div class="preview-layout">
       <div class="preview-media">
         <img id="imageModalImg" src="" alt="">
@@ -1576,11 +1597,40 @@
       previewAddBtn.onclick = null;
     }
     modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    modal.querySelector('.image-modal-close').focus();
   }
   function closeImageModal(event) {
     if (event) event.stopPropagation();
-    document.getElementById('imageModal').classList.remove('open');
+    const modal = document.getElementById('imageModal');
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
   }
+
+  document.querySelectorAll('#productsGrid .product-image').forEach(productImage => {
+    const image = productImage.querySelector('img');
+    if (!image) return;
+
+    productImage.classList.add('zoomable-product-image');
+    productImage.setAttribute('role', 'button');
+    productImage.setAttribute('tabindex', '0');
+    productImage.setAttribute('aria-label', `Preview ${image.alt || 'product image'}`);
+    productImage.addEventListener('click', () => openProductPreview(image));
+    productImage.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        openProductPreview(image);
+      }
+    });
+  });
+
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && document.getElementById('imageModal').classList.contains('open')) {
+      closeImageModal();
+    }
+  });
 
   // ─── CONTACT FORM ───
   document.getElementById('contactForm').addEventListener('submit', async (e) => {
