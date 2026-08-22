@@ -28,7 +28,7 @@
 
   html { 
     scroll-behavior: smooth;
-    scroll-padding-top: 90px;
+    scroll-padding-top: 72px;
   }
 
   body {
@@ -302,6 +302,7 @@
   section { 
     padding: 80px 20px;
     position: relative;
+    scroll-margin-top: 72px;
   }
   .container {
     max-width: 1200px;
@@ -333,82 +334,37 @@
   /* ─── ABOUT ─── */
   #about {
     background: var(--white);
+  }
+  .about-values {
+    max-width: 980px;
+    margin: 0 auto;
+  }
+  .about-pillars {
     display: grid;
-    grid-template-columns: 1fr 1.1fr;
-    gap: 80px;
-    align-items: center;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
   }
-  .about-visual {
-    position: relative;
-    display: flex;
-    justify-content: flex-start;
-    padding: 60px 20px 60px 40px;
-  }
-  .about-visual-inner {
-    position: relative;
-    width: 360px;
-    flex-shrink: 0;
-  }
-  .about-big-circle {
-    width: 360px;
-    height: 360px;
-    border-radius: 50%;
+  .pillar {
     background: var(--mint-pale);
-    position: relative;
+    border-radius: 4px;
+    padding: 28px 22px;
+    border-left: 3px solid var(--mint);
+    min-height: 118px;
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    border: 12px solid var(--mint-light);
+    text-align: center;
   }
-  .about-big-circle img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .about-stat-card {
-    position: absolute;
-    background: var(--white);
-    border: 1px solid var(--mint-light);
-    border-radius: 4px;
-    padding: 16px 20px;
-    box-shadow: var(--shadow);
-    z-index: 2;
-  }
-  /* Top-right of circle — sits above and to the right */
-  .about-stat-card:nth-child(2) {
-    top: -24px;
-    right: -60px;
-  }
-  /* Bottom-right — below the circle, shifted further right */
-  .about-stat-card:nth-child(3) {
-    bottom: -24px;
-    right: -90px;
-  }
-  .about-stat-num {
-    font-family: var(--font-display);
-    font-size: 2.2rem;
+  .pillar-title {
+    font-size: 0.86rem;
     font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: var(--black);
-    line-height: 1;
   }
-  .about-stat-label { font-size: 0.72rem; letter-spacing: 0.1em; color: var(--gray); text-transform: uppercase; margin-top: 4px; }
-  .about-text { max-width: 520px; margin-right: auto; margin-left: 40px; }
-  .about-text p {
-    font-size: 1rem;
-    line-height: 1.85;
-    color: #555;
-    margin-bottom: 20px;
-    font-weight: 300;
-    max-width: 520px;
-  }
-  .about-pillars { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 36px; }
-  .pillar { background: var(--mint-pale); border-radius: 4px; padding: 20px; border-left: 3px solid var(--mint); }
-  .pillar-title { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--black); margin-bottom: 6px; }
-  .pillar-desc { font-size: 0.85rem; color: var(--gray); line-height: 1.6; }
 
   /* ─── SHOP ─── */
-  #shop { background: var(--off-white); }
+  #shop { background: var(--mint-pale); }
   .shop-header {
     display: flex;
     flex-direction: column;
@@ -417,7 +373,7 @@
     gap: 24px;
     margin-bottom: 40px;
   }
-  .shop-filters { display: flex; gap: 12px; align-items: center; justify-content: center; }
+  .shop-filters { display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; }
   .filter-btn {
     padding: 8px 20px;
     border-radius: 2px;
@@ -431,7 +387,12 @@
     cursor: pointer;
     transition: var(--transition);
     font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
   }
+  .filter-btn svg { width: 15px; height: 15px; stroke-width: 1.8; flex-shrink: 0; }
   .filter-btn.active, .filter-btn:hover { border-color: var(--mint); color: var(--black); background: var(--mint-pale); }
 
   .products-grid {
@@ -505,6 +466,8 @@
     font-weight: 600;
   }
   .product-badge.new { background: var(--mint-deep); }
+  .product-badge.sold { background: var(--black); color: var(--white); }
+  .sold-status { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--black); border: 1.5px solid var(--black); border-radius: 2px; padding: 8px 14px; background: var(--white); }
   .product-info { padding: 20px; }
   .product-category { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mint-deep); font-weight: 500; margin-bottom: 6px; }
   .product-name { font-family: var(--font-display); font-size: 1.2rem; font-weight: 400; color: var(--black); margin-bottom: 4px; line-height: 1.2; }
@@ -603,8 +566,8 @@
   .gallery-subtitle { color: var(--gray); line-height: 1.7; max-width: 640px; }
   .gallery-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
   }
   .gallery-item { border-radius: 8px; overflow: hidden; position: relative; background: var(--mint-pale); aspect-ratio: 1 / 1; box-shadow: var(--shadow); transition: transform var(--transition), box-shadow var(--transition); }
   .gallery-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
@@ -695,7 +658,7 @@
   .contact-details { display: grid; gap: 12px; }
   .contact-detail { display: flex; align-items: center; gap: 12px; color: var(--gray); font-size: 0.92rem; background: rgba(255,255,255,.72); border: 1px solid rgba(142,202,174,.28); border-radius: 999px; padding: 10px 14px; width: fit-content; }
   .contact-detail svg { width: 18px; height: 18px; color: var(--mint-deep); flex-shrink: 0; }
-  .contact-form { background: rgba(255,255,255,.94); border: 1px solid rgba(142,202,174,.32); border-radius: 14px; box-shadow: var(--shadow-lg); padding: clamp(16px, 2.2vw, 24px); max-width: 720px; max-height: 560px; overflow-y: auto; justify-self: end; }
+  .contact-form { background: rgba(255,255,255,.94); border: 1px solid rgba(142,202,174,.32); border-radius: 14px; box-shadow: var(--shadow-lg); padding: clamp(16px, 2vw, 22px); max-width: 620px; overflow: visible; justify-self: end; }
   .contact-form-header { border-bottom: 1px solid var(--gray-light); margin-bottom: 16px; padding-bottom: 12px; }
   .contact-form-kicker { color: var(--mint-deep); font-size: .68rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 8px; }
   .contact-form-title { font-family: var(--font-display); font-size: clamp(1.65rem, 3vw, 2.25rem); font-weight: 400; color: var(--black); margin-bottom: 6px; }
@@ -703,9 +666,9 @@
   .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .form-group { margin-bottom: 12px; }
   .form-label { display: block; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--black); font-weight: 600; margin-bottom: 8px; }
-  .form-input, .form-textarea, .form-select { width: 100%; padding: 14px 16px; border: 1.5px solid var(--gray-light); border-radius: 8px; font-family: var(--font-ui); font-size: 0.94rem; color: var(--black); background: var(--off-white); outline: none; transition: border-color var(--transition), box-shadow var(--transition), background var(--transition); font-weight: 300; }
+  .form-input, .form-textarea, .form-select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--gray-light); border-radius: 8px; font-family: var(--font-ui); font-size: 0.94rem; color: var(--black); background: var(--off-white); outline: none; transition: border-color var(--transition), box-shadow var(--transition), background var(--transition); font-weight: 300; }
   .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--mint-deep); box-shadow: 0 0 0 4px rgba(142,202,174,.18); background: var(--white); }
-  .form-textarea { resize: vertical; min-height: 98px; }
+  .form-textarea { resize: vertical; min-height: 82px; }
   .form-submit { width: 100%; background: var(--black); color: var(--white); border: none; padding: 16px; border-radius: 8px; font-family: var(--font-ui); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; transition: background var(--transition), transform var(--transition), box-shadow var(--transition); margin-top: 6px; }
   .form-submit:hover { background: var(--mint-deep); transform: translateY(-1px); box-shadow: 0 12px 26px rgba(95,173,138,.25); }
   .form-success { display: none; background: var(--mint-pale); border: 1px solid var(--mint); border-radius: 8px; padding: 14px 20px; color: var(--mint-deep); font-size: 0.88rem; margin-top: 14px; text-align: center; font-weight: 500; }
@@ -752,10 +715,7 @@
   @media (max-width: 900px) {
     #hero { grid-template-columns: 1fr; gap: 40px; padding-top: 100px; min-height: auto; padding-bottom: 60px; }
     .hero-visual { height: 340px; }
-    #about { grid-template-columns: 1fr; }
-    .about-visual { justify-content: center; padding: 60px 80px 60px 40px; }
-    .about-big-circle { width: 280px; height: 280px; }
-    .about-visual-inner { width: 280px; }
+    .about-pillars { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     #contact { grid-template-columns: 1fr; }
     .footer-top { grid-template-columns: 1fr 1fr; }
     .gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -765,8 +725,8 @@
   @media (max-width: 600px) {
     section { padding: 70px 5%; }
     .footer-top { grid-template-columns: 1fr; }
-    .form-row, .gallery-grid { grid-template-columns: 1fr; }
-    .contact-form { padding: 22px; }
+    .form-row, .gallery-grid, .about-pillars { grid-template-columns: 1fr; }
+    .contact-form { padding: 18px; }
     .contact-detail { width: 100%; border-radius: 14px; }
     .hero-visual { height: 260px; }
     .about-pillars { grid-template-columns: 1fr; }
@@ -859,31 +819,12 @@
 
 <!-- ─── ABOUT ─── -->
 <section id="about">
-  <div class="about-visual">
-    <div class="about-visual-inner">
-      <div class="about-big-circle">
-        <img src="https://i.imgur.com/v8Omcnw.png" alt="About image" />
-      </div>
-      <div class="about-stat-card">
-        <div class="about-stat-num">100%</div>
-        <div class="about-stat-label">Handmade</div>
-      </div>
-      <div class="about-stat-card">
-        <div class="about-stat-num">∞</div>
-        <div class="about-stat-label">Custom Options</div>
-      </div>
-    </div>
-  </div>
-  <div class="about-text">
-    <div class="section-eyebrow">Our Story</div>
-    <h2 class="section-title">Crafted with <em>passion</em>, built with precision</h2>
-    <p>Precision Craft Studios was born from a simple belief — that handmade things carry a kind of magic that mass production can never replicate. Every stitch, every brushstroke, every design is an act of care and intention.</p>
-    <p>We specialize in custom painted hats, unique stickers, and a growing collection of creative goods — all made to reflect your vision and personality. No two pieces are alike. That's kind of the point.</p>
+  <div class="about-values">
     <div class="about-pillars">
-      <div class="pillar"><div class="pillar-title">Precision</div><div class="pillar-desc">Every detail is intentional, clean, and refined down to the last element.</div></div>
-      <div class="pillar"><div class="pillar-title">Creativity</div><div class="pillar-desc">Unlimited customization driven by imagination and artistic vision.</div></div>
-      <div class="pillar"><div class="pillar-title">Quality</div><div class="pillar-desc">Premium materials that hold up beautifully through everyday life.</div></div>
-      <div class="pillar"><div class="pillar-title">Joy</div><div class="pillar-desc">We craft what brings happiness — to you and everyone who sees it.</div></div>
+      <div class="pillar"><div class="pillar-title">Precision</div></div>
+      <div class="pillar"><div class="pillar-title">Creativity</div></div>
+      <div class="pillar"><div class="pillar-title">Quality</div></div>
+      <div class="pillar"><div class="pillar-title">Joy</div></div>
     </div>
   </div>
 </section>
@@ -896,10 +837,10 @@
       <h2 class="section-title">Shop the <em>Collection</em></h2>
     </div>
     <div class="shop-filters">
-      <button class="filter-btn active" onclick="filterProducts('all', this)">All</button>
-      <button class="filter-btn" onclick="filterProducts('hats', this)">Hats</button>
-      <button class="filter-btn" onclick="filterProducts('stickers', this)">Stickers</button>
-      <button class="filter-btn" onclick="filterProducts('baskets', this)">Baskets</button>
+      <button class="filter-btn active" onclick="filterProducts('all', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>All</button>
+      <button class="filter-btn" onclick="filterProducts('hats', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 14c2.2-4 4.8-6 8-6s5.8 2 8 6"/><path d="M3 15c4 2 14 2 18 0"/><path d="M8 14c.4-2 1.8-3 4-3s3.6 1 4 3"/></svg>Hats</button>
+      <button class="filter-btn" onclick="filterProducts('stickers', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 12l-8 8-8-8V4h8l8 8z"/><circle cx="9" cy="9" r="1.5"/></svg>Stickers</button>
+      <button class="filter-btn" onclick="filterProducts('baskets', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 10l2-5h8l2 5"/><path d="M4 10h16l-2 10H6L4 10z"/><path d="M9 14v3M15 14v3"/></svg>Baskets</button>
     </div>
   </div>
   <div class="products-grid" id="productsGrid">
@@ -1014,7 +955,8 @@
      <!-- PRODUCT 1.b -->
     <div class="product-card" data-category="hats">
       <div class="product-image">
-        <img src="https://i.imgur.com/XmdDdAC.jpeg" alt="Signature Painted Cap" class="zoomable-product-image" onclick="openProductPreview(this)">
+        <img src="https://i.imgur.com/XmdDdAC.jpeg" alt="PUERTO RICO Signature Snapback - sold" class="zoomable-product-image" onclick="openProductPreview(this)">
+        <span class="product-badge sold">Sold</span>
         <div class="product-image-overlay"></div>
       </div>
       <div class="product-info">
@@ -1023,7 +965,7 @@
         <div class="product-desc">Hand-painted with a custom design. Structured fit, premium fabric.</div>
         <div class="product-footer">
           <div class="product-price">$20.00</div>
-          <button class="add-to-cart" onclick="addToCart(this, 'puerto-rico-signature-snapback', 'PUERTO RICO Signature Snapback', 20.00, 'https://i.imgur.com/XmdDdAC.jpeg')">Add</button>
+          <div class="sold-status" aria-label="Sold">Sold</div>
         </div>
       </div>
     </div>
@@ -1151,6 +1093,8 @@
     <div class="gallery-item"><div class="gallery-item-inner"><img src="IMG_9143.jpeg" alt="Puerto Rico Flag Signature Snapback" class="gallery-img"></div><div class="gallery-caption">Puerto Rico Flag Signature Snapback</div></div>
     <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/uBWFn2d.jpeg" alt="PR Puerto Rico Signature Snapback" class="gallery-img"></div><div class="gallery-caption">PR (Puerto Rico) Signature Snapback</div></div>
     <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/pjgXs3h.png" alt="Logo Sticker Pack detail" class="gallery-img"></div><div class="gallery-caption">Logo Sticker Pack</div></div>
+    <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/UlxRQ5j.jpeg" alt="Custom Sticker Pack detail" class="gallery-img"></div><div class="gallery-caption">Custom Sticker Pack</div></div>
+    <div class="gallery-item"><div class="gallery-item-inner"><img src="https://i.imgur.com/ItSXFVP.jpeg" alt="Artisan Straw Basket" class="gallery-img"></div><div class="gallery-caption">Artisan Straw Basket</div></div>
   </div>
 </section>
 
@@ -1207,40 +1151,25 @@
   <div class="contact-form">
     <form id="contactForm" action="https://formspree.io/f/xlgvookl" method="POST" enctype="multipart/form-data">
     <div class="contact-form-header">
-      <div class="contact-form-kicker">Custom Order Intake</div>
-      <h3 class="contact-form-title">Tell us about your project</h3>
-      <p class="contact-form-subtitle">Share the essentials below and we’ll follow up with next steps, pricing, and timing.</p>
+      <div class="contact-form-kicker">Contact Precision Craft Studios</div>
+      <h3 class="contact-form-title">Send a quick message</h3>
+      <p class="contact-form-subtitle">Share the essentials and we’ll follow up with next steps.</p>
     </div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" name="firstName" required placeholder="Your first name"></div>
-      <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" name="lastName" required placeholder="Your last name"></div>
-    </div>
-    <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" name="email" required placeholder="your@email.com"></div>
-    <div class="form-row">
-      <div class="form-group"><label class="form-label">Phone (optional)</label><input type="tel" class="form-input" name="phone" placeholder="(555) 555-5555"></div>
-      <div class="form-group">
-        <label class="form-label">Preferred Reply</label>
-        <select class="form-select" name="preferredReply" required>
-          <option value="">Choose one…</option>
-          <option>Email</option>
-          <option>Phone</option>
-          <option>Either</option>
-        </select>
-      </div>
+      <div class="form-group"><label class="form-label">Name</label><input type="text" class="form-input" name="name" required placeholder="Your name"></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" name="email" required placeholder="your@email.com"></div>
     </div>
     <div class="form-group">
       <label class="form-label">I'm interested in</label>
       <select class="form-select" name="interest" required>
         <option value="">Select an option…</option>
-        <option>Custom Painted Hat</option>
+        <option>Custom Hat</option>
         <option>Custom Stickers</option>
-        <option>Matching Set</option>
+        <option>Basket</option>
         <option>General Inquiry</option>
-        <option>Collaboration</option>
       </select>
     </div>
-    <div class="form-group"><label class="form-label">Tell Us About Your Vision</label><textarea class="form-textarea" name="vision" required placeholder="Describe your idea, colors, design elements, or any details you have in mind…"></textarea></div>
-    <div class="form-group"><label class="form-label">Attach Files (optional)</label><input type="file" class="form-input" name="attachment" accept="image/*,.pdf,.ai,.eps,.svg,.psd" multiple></div>
+    <div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" name="message" required placeholder="Tell us what you need…"></textarea></div>
     <input type="hidden" name="_subject" value="New Precision Craft Studios website inquiry">
     <input type="hidden" name="_replyto" value="">
     <input type="text" name="website" class="sr-only" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -1309,6 +1238,22 @@
   // ─── NAVBAR SCROLL ───
   window.addEventListener('scroll', () => {
     document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // ─── PRECISE ANCHOR SCROLLING ───
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (event) => {
+      const hash = link.getAttribute('href');
+      if (!hash || hash === '#') return;
+      const target = document.querySelector(hash);
+      if (!target) return;
+
+      event.preventDefault();
+      const navHeight = document.getElementById('navbar')?.offsetHeight || 0;
+      const targetTop = target.getBoundingClientRect().top + window.pageYOffset - navHeight;
+      window.history.pushState(null, '', hash);
+      window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    });
   });
 
   // ─── MOBILE MENU ───
